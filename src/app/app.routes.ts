@@ -4,11 +4,11 @@ import { Authentification } from './components/authentification/authentification
 import { InscritNutritionist } from './components/inscrit-nutritionist/inscrit-nutritionist';
 import { InscritCoach } from './components/inscrit-coach/inscrit-coach';
 import { InscritBloomer } from './components/inscrit-bloomer/inscrit-bloomer';
-import { NutritionistDashboard } from './components/nutritionist-dashboard/nutritionist-dashboard';
 import { Abonnement } from './components/abonnement/abonnement';
 import { RequestMail } from './components/authentification/forget-password/request-mail/request-mail';
 import { VerifyCode } from './components/authentification/forget-password/verify-code/verify-code';
 import { ResetPassword } from './components/authentification/forget-password/reset-password/reset-password';
+import { NutritionistDashboard } from './components/dashboard/nutritionist-dashboard/nutritionist-dashboard/nutritionist-dashboard';
 
 export const routes: Routes = [
   { path: 'Acceuil',                    title: 'Acceuil',         component: Acceuil },

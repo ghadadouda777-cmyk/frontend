@@ -1,22 +1,38 @@
-<div class="page">
+<div class="page-bg">
   <div class="card">
 
-    <div class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+    <div class="logo-row">
+      <div class="logo-box">
+        <svg viewBox="0 0 24 24" fill="white" width="16" height="16">
           <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14h-2v-5h2v5zm0-7h-2V7h2v2z"/>
         </svg>
       </div>
-      <span class="logo-text">HealthFlow</span>
+      <span class="logo-name">HealthFlow</span>
     </div>
 
-    <h1>Join HealthFlow</h1>
-    <p class="subtitle">Subscribe as a Bloomer 🌸</p>
+    <div class="step-bar">
+      <div class="step done">
+        <div class="step-num">
+          <svg viewBox="0 0 24 24" width="10" height="10" fill="none" stroke="white" stroke-width="3">
+            <polyline points="20 6 9 17 4 12"/>
+          </svg>
+        </div>Account
+      </div>
+      <div class="step-sep"></div>
+      <div class="step active"><div class="step-num">2</div>Profile</div>
+      <div class="step-sep"></div>
+      <div class="step"><div class="step-num">3</div>Plan</div>
+      <div class="step-sep"></div>
+      <div class="step"><div class="step-num">4</div>Done</div>
+    </div>
+
+    <p class="form-title">Join HealthFlow</p>
+    <p class="form-sub">Subscribe as a Bloomer and start your wellness journey</p>
 
     <form (ngSubmit)="register()">
 
-      <p class="section-label">Personal info</p>
-      <div class="grid-2">
+      <p class="sec-label">Personal info</p>
+      <div class="grid2">
         <div class="field">
           <label>First name</label>
           <input type="text" [(ngModel)]="formData.prenom" name="prenom" placeholder="First name" required>
@@ -32,8 +48,8 @@
         <input type="email" [(ngModel)]="formData.email" name="email" placeholder="bloomer@example.com" required>
       </div>
 
-      <p class="section-label">Body & goals</p>
-      <div class="grid-2">
+      <p class="sec-label">Body & goals</p>
+      <div class="grid2">
         <div class="field">
           <label>Age</label>
           <input type="number" [(ngModel)]="formData.age" name="age" placeholder="25">
@@ -44,7 +60,7 @@
         </div>
       </div>
 
-      <div class="grid-2">
+      <div class="grid2">
         <div class="field">
           <label>Weight (kg)</label>
           <input type="number" [(ngModel)]="formData.weight" name="weight" placeholder="65">
@@ -76,8 +92,46 @@
         </select>
       </div>
 
-      <p class="section-label">Security</p>
-      <div class="grid-2">
+      <p class="sec-label">Subscription plan</p>
+      <div class="plan-grid">
+
+        <div class="plan-card" [class.sel]="formData.typeAbonnement === 'MOIS_1'"
+             (click)="selectPlan('MOIS_1')">
+          <div class="plan-dot"></div>
+          <div class="plan-dur">1 month</div>
+          <div class="plan-price">50 <span>DT</span></div>
+          <div class="plan-save">50 DT/mo</div>
+        </div>
+
+        <div class="plan-card" [class.sel]="formData.typeAbonnement === 'MOIS_3'"
+             (click)="selectPlan('MOIS_3')">
+          <div class="plan-dot"></div>
+          <div class="plan-dur">3 months</div>
+          <div class="plan-price">135 <span>DT</span></div>
+          <div class="plan-save">45 DT/mo</div>
+        </div>
+
+        <div class="plan-card" [class.sel]="formData.typeAbonnement === 'MOIS_6'"
+             (click)="selectPlan('MOIS_6')">
+          <div class="plan-dot"></div>
+          <div class="plan-dur">6 months</div>
+          <div class="plan-price">240 <span>DT</span></div>
+          <div class="plan-save">40 DT/mo</div>
+        </div>
+
+        <div class="plan-card" [class.sel]="formData.typeAbonnement === 'AN_1'"
+             (click)="selectPlan('AN_1')">
+          <div class="plan-badge">Best value</div>
+          <div class="plan-dot"></div>
+          <div class="plan-dur">1 year</div>
+          <div class="plan-price">420 <span>DT</span></div>
+          <div class="plan-save">35 DT/mo</div>
+        </div>
+
+      </div>
+
+      <p class="sec-label">Security</p>
+      <div class="grid2">
         <div class="field">
           <label>Password</label>
           <input type="password" [(ngModel)]="formData.pwd" name="pwd" placeholder="••••••••" required>
@@ -95,10 +149,10 @@
         </label>
       </div>
 
-      <button type="submit" class="btn-submit" [disabled]="!agreed">Subscribe now 🎉</button>
+      <button type="submit" class="btn-submit" [disabled]="!agreed">Subscribe now</button>
     </form>
 
-    <p class="login-link">
+    <p class="login-line">
       Already have an account?
       <span class="link" [routerLink]="['/authentification','bloomer']">Log in</span>
     </p>

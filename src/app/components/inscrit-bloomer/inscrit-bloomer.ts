@@ -1,9 +1,15 @@
 import { Component } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';  // ← ajouter Router
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../services/auth-service';
 
+@Component({
+  selector: 'app-inscrit-bloomer',
+  standalone: true,
+  imports: [RouterLink, FormsModule, CommonModule],
+  templateUrl: './inscrit-bloomer.html',
+  styleUrl: './inscrit-bloomer.css'
+})
 export class InscritBloomer {
   confirmPwd = '';
   agreed = false;
@@ -19,10 +25,15 @@ export class InscritBloomer {
     weight: null as number | null,
     goal: '',
     lifestyleLevel: '',
+    typeAbonnement: 'AN_1', // ✅ plan par défaut
     role: 'BLOOMER',
   };
 
-  constructor(private authService: AuthService, private router: Router) {} // ← ajouter Router
+  constructor(private router: Router) {} // ✅ supprimé AuthService
+
+  selectPlan(plan: string) { // ✅ ajouté
+    this.formData.typeAbonnement = plan;
+  }
 
   register() {
     if (!this.agreed) {
@@ -33,15 +44,9 @@ export class InscritBloomer {
       alert('Les mots de passe ne correspondent pas.');
       return;
     }
-    this.authService.register(this.formData).subscribe({
-      next: () => {
-        alert('Bloomer inscrit avec succès !');
-        this.router.navigate(['/dashboard/bloomer']); // ← REDIRECTION
-      },
-      error: (err) => {
-        console.error(err);
-        alert('Erreur lors de l\'inscription : ' + err.message);
-      }
-    });
+
+    // ✅ Sauvegarde et redirige vers abonnement
+    sessionStorage.setItem('register_data', JSON.stringify(this.formData));
+    this.router.navigate(['/abonnement']);
   }
 }
