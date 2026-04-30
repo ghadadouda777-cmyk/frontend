@@ -18,6 +18,7 @@ export class InscritNutritionist {
     nom: '',
     prenom: '',
     email: '',
+    
     pwd: '',
     tel: '',
     specialite: '',

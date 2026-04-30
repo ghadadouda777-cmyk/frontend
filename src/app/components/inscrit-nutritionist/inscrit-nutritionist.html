@@ -1,127 +1,403 @@
-<div class="page">
-  <div class="card">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthFlow – Join as Nutritionist</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <div class="logo">
-      <div class="logo-icon">
-        <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
-          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14h-2v-5h2v5zm0-7h-2V7h2v2z"/>
-        </svg>
+  :root {
+    --pink-50:  #FBEAF0;
+    --pink-100: #F4C0D1;
+    --pink-200: #ED93B1;
+    --pink-400: #D4537E;
+    --pink-600: #993556;
+    --pink-800: #72243E;
+    --pink-900: #4B1528;
+    --bg: #fff8fa;
+    --card: #ffffff;
+    --text: #1a0a10;
+    --muted: #7a4a5a;
+    --border: #f0c8d8;
+  }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem 4rem;
+    background-image:
+      radial-gradient(ellipse 600px 400px at 80% 10%, #fcd5e480 0%, transparent 70%),
+      radial-gradient(ellipse 400px 300px at 10% 80%, #f9b8cd50 0%, transparent 70%);
+  }
+
+  .card {
+    background: var(--card);
+    border-radius: 24px;
+    border: 1px solid var(--border);
+    padding: 2.5rem 2.25rem;
+    width: 100%;
+    max-width: 560px;
+    box-shadow: 0 8px 40px #d4537e14, 0 2px 8px #d4537e08;
+  }
+
+  .logo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.75rem;
+  }
+  .logo-icon {
+    width: 36px; height: 36px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-600));
+    display: flex; align-items: center; justify-content: center;
+  }
+  .logo-text {
+    font-family: 'DM Serif Display', serif;
+    font-size: 18px;
+    color: var(--pink-600);
+    letter-spacing: -0.02em;
+  }
+
+  h1 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--text);
+    margin-bottom: 4px;
+    letter-spacing: -0.02em;
+  }
+  .subtitle {
+    font-size: 14px;
+    color: var(--muted);
+    margin-bottom: 2rem;
+  }
+
+  .section-label {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--pink-400);
+    margin-bottom: 12px;
+    margin-top: 1.5rem;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+  }
+  .section-label:first-of-type { margin-top: 0; }
+
+  .row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field { margin-bottom: 12px; }
+
+  label {
+    display: block;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--muted);
+    margin-bottom: 5px;
+  }
+
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  select {
+    width: 100%;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    transition: border-color 0.15s, box-shadow 0.15s;
+    appearance: none;
+  }
+  input::placeholder { color: #c4a0b0; }
+  input:focus, select:focus {
+    border-color: var(--pink-400);
+    box-shadow: 0 0 0 3px #d4537e18;
+  }
+  select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23993556' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    padding-right: 36px;
+  }
+
+  /* Plans */
+  .plan-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-top: 4px;
+  }
+  .plan-card {
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px 8px;
+    text-align: center;
+    cursor: pointer;
+    position: relative;
+    transition: border-color 0.15s, box-shadow 0.15s, background 0.15s;
+    background: #fff;
+  }
+  .plan-card:hover { border-color: var(--pink-200); background: var(--pink-50); }
+  .plan-card.selected {
+    border: 2px solid var(--pink-400);
+    background: var(--pink-50);
+    box-shadow: 0 0 0 3px #d4537e12;
+  }
+  .plan-badge {
+    position: absolute;
+    top: -10px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--pink-400);
+    color: #fff;
+    font-size: 9px;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 20px;
+    white-space: nowrap;
+  }
+  .plan-check {
+    width: 14px; height: 14px;
+    border-radius: 50%;
+    border: 1.5px solid var(--border);
+    margin: 0 auto 8px;
+    transition: background 0.15s, border-color 0.15s;
+    position: relative;
+  }
+  .plan-card.selected .plan-check {
+    background: var(--pink-400);
+    border-color: var(--pink-400);
+  }
+  .plan-card.selected .plan-check::after {
+    content: '';
+    display: block;
+    width: 5px; height: 5px;
+    background: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  .plan-duration { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
+  .plan-price { font-size: 18px; font-weight: 600; color: var(--text); line-height: 1; }
+  .plan-price span { font-size: 11px; font-weight: 400; color: var(--muted); }
+  .plan-save { font-size: 10px; color: var(--muted); margin-top: 4px; }
+  .plan-card.selected .plan-price { color: var(--pink-600); }
+
+  /* Checkbox */
+  .check-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin: 1.25rem 0;
+  }
+  .check-row input[type="checkbox"] {
+    width: 16px; height: 16px;
+    flex-shrink: 0;
+    margin-top: 2px;
+    accent-color: var(--pink-400);
+    cursor: pointer;
+  }
+  .check-row label {
+    font-size: 13px;
+    color: var(--muted);
+    cursor: pointer;
+    margin: 0;
+  }
+  .link { color: var(--pink-500, var(--pink-400)); text-decoration: underline; cursor: pointer; }
+
+  /* Submit */
+  button[type="button"] {
+    width: 100%;
+    height: 46px;
+    background: linear-gradient(135deg, var(--pink-400), var(--pink-600));
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    letter-spacing: 0.01em;
+    transition: opacity 0.15s, transform 0.1s;
+  }
+  button[type="button"]:hover { opacity: 0.92; }
+  button[type="button"]:active { transform: scale(0.99); }
+  button[type="button"]:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .login-link {
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+    margin-top: 1.25rem;
+  }
+  .login-link .link { font-weight: 500; }
+</style>
+</head>
+<body>
+
+<div class="card">
+
+  <div class="logo">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="white" width="18" height="18">
+        <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14h-2v-5h2v5zm0-7h-2V7h2v2z"/>
+      </svg>
+    </div>
+    <span class="logo-text">HealthFlow</span>
+  </div>
+
+  <h1>Join HealthFlow</h1>
+  <p class="subtitle">Subscribe as a Nutritionist 🥗</p>
+
+  <form id="inscritForm">
+
+    <p class="section-label">Personal info</p>
+    <div class="row">
+      <div class="field">
+        <label>First name</label>
+        <input type="text" name="prenom" placeholder="First name" required>
       </div>
-      <span class="logo-text">HealthFlow</span>
+      <div class="field">
+        <label>Last name</label>
+        <input type="text" name="nom" placeholder="Last name" required>
+      </div>
     </div>
 
-    <h1>Join HealthFlow</h1>
-    <p class="subtitle">Subscribe as a Nutritionist 🥗</p>
+    <div class="field">
+      <label>Email address</label>
+      <input type="email" name="email" placeholder="nutritionist@example.com" required>
+    </div>
 
-    <form #inscritForm="ngForm">
-
-      <p class="section-label">Personal info</p>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label>First name</label>
-          <input type="text" [(ngModel)]="formData.prenom" name="prenom" placeholder="First name" required>
-        </div>
-        <div class="col-md-6">
-          <label>Last name</label>
-          <input type="text" [(ngModel)]="formData.nom" name="nom" placeholder="Last name" required>
-        </div>
-      </div>
-
-      <div class="field">
-        <label>Email address</label>
-        <input type="email" [(ngModel)]="formData.email" name="email" placeholder="nutritionist@example.com" required>
-      </div>
-
+    <div class="row">
       <div class="field">
         <label>Phone number</label>
-        <input type="tel" [(ngModel)]="formData.tel" name="tel" placeholder="+216 XX XXX XXX">
+        <input type="tel" name="tel" placeholder="+216 XX XXX XXX">
       </div>
-
       <div class="field">
         <label>Location</label>
-        <input type="text" [(ngModel)]="formData.localisation" name="localisation" placeholder="City, State / Country">
+        <input type="text" name="localisation" placeholder="City, Country">
+      </div>
+    </div>
+
+    <p class="section-label">Professional info</p>
+
+    <div class="field">
+      <label>Speciality</label>
+      <select name="specialite">
+        <option value="">Select your speciality</option>
+        <option value="WEIGHT_LOSS">Weight Loss</option>
+        <option value="SPORTS">Sports Nutrition</option>
+        <option value="CLINICAL">Clinical Nutrition</option>
+        <option value="HOSPITAL">Hospital Nutrition</option>
+        <option value="PEDIATRIC">Pediatric Nutrition</option>
+        <option value="OTHER">Other</option>
+      </select>
+    </div>
+
+    <p class="section-label">Subscription plan</p>
+    <div class="plan-grid">
+
+      <div class="plan-card" onclick="selectPlan(this, 'MOIS_1')">
+        <div class="plan-check"></div>
+        <div class="plan-duration">1 Month</div>
+        <div class="plan-price">300 <span>DT</span></div>
+        <div class="plan-save">300 DT / month</div>
       </div>
 
-      <p class="section-label">Professional info</p>
+      <div class="plan-card" onclick="selectPlan(this, 'MOIS_3')">
+        <div class="plan-check"></div>
+        <div class="plan-duration">3 Months</div>
+        <div class="plan-price">750 <span>DT</span></div>
+        <div class="plan-save">250 DT / month</div>
+      </div>
 
+      <div class="plan-card" onclick="selectPlan(this, 'MOIS_6')">
+        <div class="plan-check"></div>
+        <div class="plan-duration">6 Months</div>
+        <div class="plan-price">1320 <span>DT</span></div>
+        <div class="plan-save">220 DT / month</div>
+      </div>
+
+      <div class="plan-card selected" onclick="selectPlan(this, 'AN_1')">
+        <div class="plan-badge">Best value ⭐</div>
+        <div class="plan-check"></div>
+        <div class="plan-duration">1 Year</div>
+        <div class="plan-price">2160 <span>DT</span></div>
+        <div class="plan-save">180 DT / month</div>
+      </div>
+
+    </div>
+
+    <p class="section-label">Security</p>
+    <div class="row">
       <div class="field">
-        <label>Speciality</label>
-        <select [(ngModel)]="formData.specialite" name="specialite">
-          <option value="">Select your speciality</option>
-          <option value="WEIGHT_LOSS">Weight Loss</option>
-          <option value="SPORTS">Sports Nutrition</option>
-          <option value="CLINICAL">Clinical Nutrition</option>
-          <option value="HOSPITAL">Hospital Nutrition</option>
-          <option value="PEDIATRIC">Pediatric Nutrition</option>
-          <option value="OTHER">Other</option>
-        </select>
+        <label>Password</label>
+        <input type="password" name="pwd" placeholder="••••••••" required>
       </div>
-
-      <p class="section-label">Subscription plan</p>
-      <div class="plan-grid">
-
-        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_1'"
-             (click)="formData.typeAbonnement = 'MOIS_1'">
-          <div class="plan-check"></div>
-          <div class="plan-duration">1 Month</div>
-          <div class="plan-price">300 <span>DT</span></div>
-          <div class="plan-save">300 DT / month</div>
-        </div>
-
-        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_3'"
-             (click)="formData.typeAbonnement = 'MOIS_3'">
-          <div class="plan-check"></div>
-          <div class="plan-duration">3 Months</div>
-          <div class="plan-price">750 <span>DT</span></div>
-          <div class="plan-save">250 DT / month</div>
-        </div>
-
-        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_6'"
-             (click)="formData.typeAbonnement = 'MOIS_6'">
-          <div class="plan-check"></div>
-          <div class="plan-duration">6 Months</div>
-          <div class="plan-price">1320 <span>DT</span></div>
-          <div class="plan-save">220 DT / month</div>
-        </div>
-
-        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'AN_1'"
-             (click)="formData.typeAbonnement = 'AN_1'">
-          <div class="plan-check"></div>
-          <div class="plan-duration">1 Year ⭐</div>
-          <div class="plan-price">2160 <span>DT</span></div>
-          <div class="plan-save">180 DT / month</div>
-        </div>
-
+      <div class="field">
+        <label>Confirm password</label>
+        <input type="password" name="confirmPwd" placeholder="••••••••">
       </div>
+    </div>
 
-      <p class="section-label">Security</p>
-      <div class="row g-3">
-        <div class="col-md-6">
-          <label>Password</label>
-          <input type="password" [(ngModel)]="formData.pwd" name="pwd" placeholder="••••••••" required>
-        </div>
-        <div class="col-md-6">
-          <label>Confirm password</label>
-          <input type="password" [(ngModel)]="confirmPwd" name="confirmPwd" placeholder="••••••••">
-        </div>
-      </div>
+    <div class="check-row">
+      <input type="checkbox" id="terms" name="agreed">
+      <label for="terms">
+        I agree to the <span class="link">Terms and Conditions</span> and <span class="link">Privacy Policy</span>
+      </label>
+    </div>
 
-      <div class="check-row">
-        <input type="checkbox" [(ngModel)]="agreed" name="agreed" id="terms-n">
-        <label for="terms-n">
-          I agree to the <span class="link">Terms and Conditions</span> and <span class="link">Privacy Policy</span>
-        </label>
-      </div>
+    <button type="button" id="submitBtn" disabled onclick="register()">Subscribe now 🎉</button>
 
-      <!-- ✅ type="button" pour éviter le submit du formulaire -->
-      <button type="button" [disabled]="!agreed" (click)="register()">Subscribe now 🎉</button>
+  </form>
 
-    </form>
+  <p class="login-link">
+    Already have an account? <span class="link">Log in</span>
+  </p>
 
-    <p class="login-link">
-      Already have an account?
-      <span class="link" [routerLink]="['/authentification','nutritionist']">Log in</span>
-    </p>
-
-  </div>
 </div>
+
+<script>
+  let selectedPlan = 'AN_1';
+
+  function selectPlan(el, plan) {
+    document.querySelectorAll('.plan-card').forEach(p => p.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedPlan = plan;
+  }
+
+  document.getElementById('terms').addEventListener('change', function() {
+    document.getElementById('submitBtn').disabled = !this.checked;
+  });
+
+  function register() {
+    const form = document.getElementById('inscritForm');
+    const data = {
+      prenom: form.prenom.value,
+      nom: form.nom.value,
+      email: form.email.value,
+      tel: form.tel.value,
+      localisation: form.localisation.value,
+      specialite: form.specialite.value,
+      typeAbonnement: selectedPlan,
+      pwd: form.pwd.value
+    };
+    console.log('Register:', data);
+    alert('Registration submitted!');
+  }
+</script>
+
+</body>
+</html>
