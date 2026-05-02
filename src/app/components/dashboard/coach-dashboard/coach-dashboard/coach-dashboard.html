@@ -1,0 +1,213 @@
+<div class="dashboard-shell">
+  <aside class="sidebar">
+    <div class="brand">
+      <span class="brand-icon">HF</span>
+      <div>
+        <h1>HealthFlow</h1>
+        <p>Coach Space</p>
+      </div>
+    </div>
+
+    <nav class="menu">
+      @for (item of sidebarItems; track item.label) {
+        <button class="menu-item" [class.active]="item.active">
+          <span class="menu-icon">{{ item.icon }}</span>
+          <span class="menu-label">{{ item.label }}</span>
+          @if (item.badgeCount) {
+            <span class="menu-badge">{{ item.badgeCount }}</span>
+          }
+        </button>
+      }
+    </nav>
+  </aside>
+
+  <main class="dashboard-main">
+    <header class="top-header card">
+      <div class="search-bar">
+        <span>🔎</span>
+        <input type="text" [placeholder]="searchPlaceholder" />
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" aria-label="Notifications">🔔</button>
+        <div class="user-chip">
+          <div class="avatar">S</div>
+          <div>
+            <p class="user-name">{{ coachName }}</p>
+            <p class="user-role">{{ coachRole }}</p>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    @if (isLoading) {
+      <section class="status-banner loading">Loading real backend data...</section>
+    }
+    @if (apiError) {
+      <section class="status-banner error">{{ apiError }}</section>
+    }
+
+    <section class="overview-grid">
+      @for (card of overviewCards; track card.label) {
+        <article class="card overview-card" [attr.data-accent]="card.accent">
+          <p class="kpi-label">{{ card.label }}</p>
+          <p class="kpi-value">{{ card.value }}</p>
+          <p class="kpi-helper">{{ card.helper }}</p>
+        </article>
+      }
+    </section>
+
+    <section class="section card">
+      <div class="section-header">
+        <h2>Workout Plans</h2>
+        <button class="primary-btn">+ Create New Plan</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Plan Name</th>
+              <th>Duration</th>
+              <th>Sessions / Week</th>
+              <th>Assigned Clients</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (plan of workoutPlans; track plan.id) {
+              <tr>
+                <td>{{ plan.nom }}</td>
+                <td>{{ plan.dureeSemaines }} weeks</td>
+                <td>{{ plan.seancesParSemaine }}</td>
+                <td>{{ plan.assignedClientsCount }}</td>
+                <td class="actions-cell">
+                  <button class="ghost-btn">Edit</button>
+                  <button class="ghost-btn danger">Delete</button>
+                  <button class="ghost-btn">Assign</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="split-grid">
+      <article class="section card">
+        <div class="section-header">
+          <h2>Exercises Library</h2>
+          <button class="primary-btn">+ Add Exercise</button>
+        </div>
+        <div class="stack-list">
+          @for (exercise of exercises; track exercise.id) {
+            <div class="list-item">
+              <div class="list-head">
+                <h3>{{ exercise.nom }}</h3>
+                <span class="pill">{{ exercise.categorie }}</span>
+              </div>
+              <p>{{ exercise.description }}</p>
+              <div class="row-actions">
+                <button class="ghost-btn">Edit</button>
+                <button class="ghost-btn">Reuse in Plan</button>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="section card">
+        <div class="section-header">
+          <h2>Clients (Patients)</h2>
+        </div>
+        <div class="stack-list">
+          @for (client of clients; track client.id) {
+            <div class="list-item">
+              <div class="list-head">
+                <h3>{{ client.name }}</h3>
+                <span class="progress">{{ client.progressStatus }}</span>
+              </div>
+              <p>{{ client.email }}</p>
+              <p class="muted">Plans: {{ client.assignedPlans.join(', ') }}</p>
+              <div class="row-actions">
+                <button class="ghost-btn">View Profile</button>
+                <button class="ghost-btn">Assign Plan</button>
+                <button class="ghost-btn">Message</button>
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="split-grid">
+      <article class="section card">
+        <div class="section-header">
+          <h2>Conversations</h2>
+          <p class="muted">Real-time chat preview</p>
+        </div>
+        <div class="stack-list compact">
+          @for (chat of conversations; track chat.id) {
+            <div class="chat-item">
+              <div>
+                <h3>{{ chat.clientName }}</h3>
+                <p>{{ chat.lastMessage }}</p>
+              </div>
+              <div class="chat-meta">
+                <span>{{ chat.timestamp }}</span>
+                @if (chat.unreadCount > 0) {
+                  <span class="menu-badge">{{ chat.unreadCount }}</span>
+                }
+              </div>
+            </div>
+          }
+        </div>
+      </article>
+
+      <article class="section card">
+        <div class="section-header">
+          <h2>Analytics</h2>
+        </div>
+        <div class="analytics-list">
+          @for (item of analytics; track item.label) {
+            <div class="analytics-item">
+              <div class="analytics-head">
+                <h3>{{ item.label }}</h3>
+                <span>{{ item.value }}</span>
+              </div>
+              <div class="bar-track">
+                <div class="bar-fill" [style.width.%]="item.fillPercent"></div>
+              </div>
+              <p class="muted">{{ item.trend }}</p>
+            </div>
+          }
+        </div>
+      </article>
+    </section>
+
+    <section class="split-grid">
+      <article class="section card subscription-card">
+        <div class="section-header">
+          <h2>Subscription</h2>
+          <span class="pill" [class.active]="subscription.status === 'Active'">{{ subscription.status }}</span>
+        </div>
+        <p class="sub-line"><strong>Current Plan:</strong> {{ subscription.currentPlan }}</p>
+        <p class="sub-line"><strong>Expiration Date:</strong> {{ subscription.expirationDate }}</p>
+        <p class="sub-line"><strong>Remaining:</strong> {{ subscription.remainingDays }} days</p>
+        <button class="primary-btn">Renew Subscription</button>
+      </article>
+
+      <article class="section card">
+        <div class="section-header">
+          <h2>Notifications</h2>
+        </div>
+        <ul class="notification-list">
+          @for (notification of notifications; track notification.id) {
+            <li>
+              <span class="pill subtle">{{ notification.type }}</span>
+              <p>{{ notification.text }}</p>
+            </li>
+          }
+        </ul>
+      </article>
+    </section>
+  </main>
+</div>
