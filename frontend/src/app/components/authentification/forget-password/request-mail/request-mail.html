@@ -1,0 +1,37 @@
+<div class="body">
+  <div class="card">
+    <h1 class="title">Forgot Password?</h1>
+    <p class="subtitle">Enter your email and we'll send you a reset code</p>
+
+    <form (ngSubmit)="sendCode()" #mailForm="ngForm">
+      <div class="field">
+        <label class="label">Email</label>
+        <input
+          type="email"
+          class="input"
+          placeholder="ahmed@email.com"
+          [(ngModel)]="email"
+          name="email"
+          required
+          email
+          #emailInput="ngModel"
+        />
+        <span class="error" *ngIf="emailInput.invalid && emailInput.touched">
+          Please enter a valid email
+        </span>
+      </div>
+
+      <div class="error-msg" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="success-msg" *ngIf="successMessage">{{ successMessage }}</div>
+
+      <button type="submit" class="btn-primary" [disabled]="loading || mailForm.invalid">
+        <span *ngIf="!loading">Send Reset Code</span>
+        <span *ngIf="loading" class="spinner"></span>
+      </button>
+    </form>
+
+    <p class="back-row">
+      Remember your password?
+    </p>
+  </div>
+</div>

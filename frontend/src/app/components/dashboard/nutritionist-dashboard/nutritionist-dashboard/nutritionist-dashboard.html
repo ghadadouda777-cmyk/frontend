@@ -1,0 +1,220 @@
+<!-- ═══ HEADER ═══ -->
+<div class="dashboard-header">
+  <div class="header-left">
+    <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
+    <p class="welcome-text">Welcome back! 👋</p>
+  </div>
+  <div class="header-right">
+    <button class="btn-new-client">+ New Client</button>
+    <div class="avatar-icon">👤</div>
+  </div>
+</div>
+
+<!-- ═══ STATS ═══ -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon purple">👥</div>
+    <div class="stat-info">
+      <div class="stat-badge green">24</div>
+      <p class="stat-label">Total Clients</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">📅</div>
+    <div class="stat-info">
+      <div class="stat-badge blue">{{ rendezVousConfirmes.length }}</div>
+      <p class="stat-label">Appointments Today</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">🥗</div>
+    <div class="stat-info">
+      <div class="stat-badge orange">18</div>
+      <p class="stat-label">Meal Plans</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon pink">💬</div>
+    <div class="stat-info">
+      <div class="stat-badge purple">12</div>
+      <p class="stat-label">Messages</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN GRID ═══ -->
+<div class="main-grid">
+
+  <!-- LEFT: Today's Appointments -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Today's Appointments</h2>
+      <a class="view-all">View All</a>
+    </div>
+
+    <div class="tabs">
+      <button [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
+        En attente ({{ rendezVousEnAttente.length }})
+      </button>
+      <button [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
+        Confirmés ({{ rendezVousConfirmes.length }})
+      </button>
+      <button [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
+        Refusés ({{ rendezVousRefuses.length }})
+      </button>
+    </div>
+
+    @if (activeTab === 'attente') {
+      @for (rdv of rendezVousEnAttente; track rdv.id) {
+        <div class="rdv-item">
+          <div class="rdv-time-bubble">
+            {{ rdv.dateHeure | date:'HH' }}
+          </div>
+          <div class="rdv-info">
+            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+            <p class="rdv-type">{{ rdv.motif }}</p>
+          </div>
+          <div class="rdv-actions">
+            <button class="btn-accept" (click)="accepter(rdv.id)">✓ Accepter</button>
+            <button class="btn-refuse" (click)="refuser(rdv.id)">✗ Refuser</button>
+          </div>
+          <div class="phone-btn">📞</div>
+        </div>
+      }
+      @if (rendezVousEnAttente.length === 0) {
+        <p class="empty-state">Aucun rendez-vous en attente</p>
+      }
+    }
+
+    @if (activeTab === 'confirme') {
+      @for (rdv of rendezVousConfirmes; track rdv.id) {
+        <div class="rdv-item">
+          <div class="rdv-time-bubble">
+            {{ rdv.dateHeure | date:'HH' }}
+          </div>
+          <div class="rdv-info">
+            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+            <p class="rdv-type">{{ rdv.motif }}</p>
+          </div>
+          <span class="badge-status confirmed">confirmed</span>
+          <div class="phone-btn pink">📞</div>
+        </div>
+      }
+      @if (rendezVousConfirmes.length === 0) {
+        <p class="empty-state">Aucun rendez-vous confirmé</p>
+      }
+    }
+
+    @if (activeTab === 'refuse') {
+      @for (rdv of rendezVousRefuses; track rdv.id) {
+        <div class="rdv-item">
+          <div class="rdv-time-bubble grey">
+            {{ rdv.dateHeure | date:'HH' }}
+          </div>
+          <div class="rdv-info">
+            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+            <p class="rdv-type">{{ rdv.motif }}</p>
+          </div>
+          <span class="badge-status refused">refused</span>
+          <div class="phone-btn grey">📞</div>
+        </div>
+      }
+      @if (rendezVousRefuses.length === 0) {
+        <p class="empty-state">Aucun rendez-vous refusé</p>
+      }
+    }
+  </div>
+
+  <!-- RIGHT: Recent Clients -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Recent Clients</h2>
+      <a class="view-all">View All</a>
+    </div>
+
+    @for (c of consultations; track c.id) {
+      <div class="client-item" (click)="openConsultation(c.id)">
+        <div class="client-row">
+          <div class="client-meta">
+            <p class="client-name">Patient #{{ c.userId }}</p>
+            <p class="client-goal">{{ c.objectif }}</p>
+          </div>
+          <span class="goal-icon">🎯</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-fill" [style.width]="'60%'"></div>
+        </div>
+        <div class="progress-meta">
+          <span>Progress</span>
+          <span>{{ c.imc | number:'1.1-1' }}</span>
+        </div>
+        <p class="last-visit">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</p>
+      </div>
+    }
+    @if (consultations.length === 0) {
+      <p class="empty-state">Aucune consultation</p>
+    }
+  </div>
+</div>
+
+<!-- ═══ CONSULTATIONS PATIENTS ═══ -->
+<div class="card full-width">
+  <div class="card-header">
+    <h2>Consultations Patients</h2>
+  </div>
+
+  @for (c of consultations; track c.id) {
+    <div class="consultation-row" (click)="openConsultation(c.id)">
+      <div class="patient-avatar">P</div>
+      <div class="consultation-info">
+        <span class="patient-id">Patient #{{ c.userId }}</span>
+        <span class="consultation-date">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</span>
+        <span class="objectif-tag">{{ c.objectif }}</span>
+      </div>
+      <span class="imc-pill">IMC: {{ c.imc | number:'1.1-1' }}</span>
+    </div>
+  }
+  @if (consultations.length === 0) {
+    <p class="empty-state">Aucune consultation</p>
+  }
+</div>
+
+<!-- ═══ QUICK ACTIONS ═══ -->
+<div class="quick-actions-grid">
+  <div class="action-card">
+    <div class="action-icon">📊</div>
+    <h3>Create Meal Plan</h3>
+    <p>Design personalized nutrition plans</p>
+  </div>
+  <div class="action-card">
+    <div class="action-icon">📝</div>
+    <h3>Client Reports</h3>
+    <p>View progress and analytics</p>
+  </div>
+  <div class="action-card">
+    <div class="action-icon">📚</div>
+    <h3>Resources</h3>
+    <p>Nutrition guides and recipes</p>
+  </div>
+</div>
+
+<!-- ═══ MODAL CONSULTATION ═══ -->
+@if (showModal && selectedConsultation) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <button class="modal-close" (click)="closeModal()">✕</button>
+      <h3>Détails Consultation</h3>
+      <div class="modal-row"><span>Poids</span><strong>{{ selectedConsultation.poids }} kg</strong></div>
+      <div class="modal-row"><span>Taille</span><strong>{{ selectedConsultation.taille }} m</strong></div>
+      <div class="modal-row"><span>IMC</span><strong>{{ selectedConsultation.imc }}</strong></div>
+      <div class="modal-row"><span>Objectif</span><strong>{{ selectedConsultation.objectif }}</strong></div>
+      <div class="modal-row"><span>Diagnostic</span><strong>{{ selectedConsultation.diagnostic }}</strong></div>
+      <div class="modal-row"><span>Recommandations</span><strong>{{ selectedConsultation.recommandations }}</strong></div>
+      <div class="modal-row"><span>Notes</span><strong>{{ selectedConsultation.notes }}</strong></div>
+      <div class="modal-row"><span>Date consultation</span><strong>{{ selectedConsultation.dateConsultation | date:'dd/MM/yyyy HH:mm' }}</strong></div>
+      @if (selectedConsultation.prochainRdv) {
+        <div class="modal-row"><span>Prochain RDV</span><strong>{{ selectedConsultation.prochainRdv | date:'dd/MM/yyyy' }}</strong></div>
+      }
+    </div>
+  </div>
+}
