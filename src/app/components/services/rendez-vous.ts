@@ -8,7 +8,7 @@ export class RendezVousService {
   getByPatient(patientId: number) {
     throw new Error('Method not implemented.');
   } // ✅ renamed
-  private api = 'http://localhost:8085/api/rendez-vous';
+  private api = 'http://localhost:8084/api/rendez-vous';
 
   constructor(private http: HttpClient) {}
 

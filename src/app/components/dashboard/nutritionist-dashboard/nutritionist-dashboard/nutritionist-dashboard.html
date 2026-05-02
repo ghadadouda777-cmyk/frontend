@@ -1,220 +1,650 @@
-<!-- ═══ HEADER ═══ -->
-<div class="dashboard-header">
-  <div class="header-left">
-    <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
-    <p class="welcome-text">Welcome back! 👋</p>
-  </div>
-  <div class="header-right">
-    <button class="btn-new-client">+ New Client</button>
-    <div class="avatar-icon">👤</div>
-  </div>
-</div>
+<div class="dashboard-wrapper">
 
-<!-- ═══ STATS ═══ -->
-<div class="stats-grid">
-  <div class="stat-card">
-    <div class="stat-icon purple">👥</div>
-    <div class="stat-info">
-      <div class="stat-badge green">24</div>
-      <p class="stat-label">Total Clients</p>
+  <!-- ═══ SIDENAV ═══ -->
+  <nav class="sidenav">
+    <div class="nav-logo">
+      <span class="nav-logo-icon">🥗</span>
+      <span class="nav-logo-text">NutriPro</span>
     </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon blue">📅</div>
-    <div class="stat-info">
-      <div class="stat-badge blue">{{ rendezVousConfirmes.length }}</div>
-      <p class="stat-label">Appointments Today</p>
+    <div class="nav-item" [class.active]="activePage==='dashboard'" (click)="setPage('dashboard')">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Dashboard</span>
     </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon orange">🥗</div>
-    <div class="stat-info">
-      <div class="stat-badge orange">18</div>
-      <p class="stat-label">Meal Plans</p>
+    <div class="nav-item" [class.active]="activePage==='conv'" (click)="goToConversation()">
+      <span class="nav-icon">💬</span>
+      <span class="nav-label">Conversations</span>
     </div>
-  </div>
-  <div class="stat-card">
-    <div class="stat-icon pink">💬</div>
-    <div class="stat-info">
-      <div class="stat-badge purple">12</div>
-      <p class="stat-label">Messages</p>
+    <div class="nav-item" [class.active]="activePage==='calendar'" (click)="setPage('calendar')">
+      <span class="nav-icon">📅</span>
+      <span class="nav-label">Agenda</span>
     </div>
-  </div>
-</div>
-
-<!-- ═══ MAIN GRID ═══ -->
-<div class="main-grid">
-
-  <!-- LEFT: Today's Appointments -->
-  <div class="card">
-    <div class="card-header">
-      <h2>Today's Appointments</h2>
-      <a class="view-all">View All</a>
+    <div class="nav-item" [class.active]="activePage==='clients'" (click)="setPage('clients')">
+      <span class="nav-icon">👥</span>
+      <span class="nav-label">Clients</span>
     </div>
-
-    <div class="tabs">
-      <button [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
-        En attente ({{ rendezVousEnAttente.length }})
-      </button>
-      <button [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
-        Confirmés ({{ rendezVousConfirmes.length }})
-      </button>
-      <button [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
-        Refusés ({{ rendezVousRefuses.length }})
-      </button>
+    <div class="nav-item" [class.active]="activePage==='rapports'" (click)="setPage('rapports')">
+      <span class="nav-icon">📝</span>
+      <span class="nav-label">Rapports</span>
     </div>
-
-    @if (activeTab === 'attente') {
-      @for (rdv of rendezVousEnAttente; track rdv.id) {
-        <div class="rdv-item">
-          <div class="rdv-time-bubble">
-            {{ rdv.dateHeure | date:'HH' }}
-          </div>
-          <div class="rdv-info">
-            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-            <p class="rdv-type">{{ rdv.motif }}</p>
-          </div>
-          <div class="rdv-actions">
-            <button class="btn-accept" (click)="accepter(rdv.id)">✓ Accepter</button>
-            <button class="btn-refuse" (click)="refuser(rdv.id)">✗ Refuser</button>
-          </div>
-          <div class="phone-btn">📞</div>
-        </div>
-      }
-      @if (rendezVousEnAttente.length === 0) {
-        <p class="empty-state">Aucun rendez-vous en attente</p>
-      }
-    }
-
-    @if (activeTab === 'confirme') {
-      @for (rdv of rendezVousConfirmes; track rdv.id) {
-        <div class="rdv-item">
-          <div class="rdv-time-bubble">
-            {{ rdv.dateHeure | date:'HH' }}
-          </div>
-          <div class="rdv-info">
-            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-            <p class="rdv-type">{{ rdv.motif }}</p>
-          </div>
-          <span class="badge-status confirmed">confirmed</span>
-          <div class="phone-btn pink">📞</div>
-        </div>
-      }
-      @if (rendezVousConfirmes.length === 0) {
-        <p class="empty-state">Aucun rendez-vous confirmé</p>
-      }
-    }
-
-    @if (activeTab === 'refuse') {
-      @for (rdv of rendezVousRefuses; track rdv.id) {
-        <div class="rdv-item">
-          <div class="rdv-time-bubble grey">
-            {{ rdv.dateHeure | date:'HH' }}
-          </div>
-          <div class="rdv-info">
-            <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-            <p class="rdv-type">{{ rdv.motif }}</p>
-          </div>
-          <span class="badge-status refused">refused</span>
-          <div class="phone-btn grey">📞</div>
-        </div>
-      }
-      @if (rendezVousRefuses.length === 0) {
-        <p class="empty-state">Aucun rendez-vous refusé</p>
-      }
-    }
-  </div>
-
-  <!-- RIGHT: Recent Clients -->
-  <div class="card">
-    <div class="card-header">
-      <h2>Recent Clients</h2>
-      <a class="view-all">View All</a>
+    <div class="nav-sep"></div>
+    <div class="nav-item" [class.active]="activePage==='params'" (click)="setPage('params')">
+      <span class="nav-icon">⚙️</span>
+      <span class="nav-label">Paramètres</span>
     </div>
-
-    @for (c of consultations; track c.id) {
-      <div class="client-item" (click)="openConsultation(c.id)">
-        <div class="client-row">
-          <div class="client-meta">
-            <p class="client-name">Patient #{{ c.userId }}</p>
-            <p class="client-goal">{{ c.objectif }}</p>
-          </div>
-          <span class="goal-icon">🎯</span>
-        </div>
-        <div class="progress-bar">
-          <div class="progress-fill" [style.width]="'60%'"></div>
-        </div>
-        <div class="progress-meta">
-          <span>Progress</span>
-          <span>{{ c.imc | number:'1.1-1' }}</span>
-        </div>
-        <p class="last-visit">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</p>
+    <div class="nav-footer">
+      <div class="nav-avatar">NK</div>
+      <div class="nav-user-info">
+        <span class="nav-user-name">Dr. NK</span>
+        <span class="nav-user-role">Nutritionniste</span>
       </div>
-    }
-    @if (consultations.length === 0) {
+    </div>
+  </nav>
+
+  <!-- ═══ MAIN CONTENT ═══ -->
+  <div class="main-content">
+
+    <!-- ═══ HEADER ═══ -->
+    <div class="dashboard-header">
+      <div class="header-left">
+        <div class="brand-mark">🥗</div>
+        <div>
+          <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
+          <p class="welcome-text">Bienvenue ! Mardi 6 mai 2025</p>
+        </div>
+      </div>
+      <div class="header-right">
+        <div class="notif-btn">
+          🔔
+          <span class="notif-dot"></span>
+        </div>
+        <button class="btn-new-client">+ Nouveau client</button>
+        <div class="avatar-icon">NK</div>
+      </div>
+    </div>
+
+    <!-- ═══ STATS ═══ -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon si-sage">👥</div>
+        <div class="stat-info">
+          <div class="stat-value v-sage">{{ consultations.length }}</div>
+          <p class="stat-label">Total clients</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-plum">📅</div>
+        <div class="stat-info">
+          <div class="stat-value v-plum">{{ rendezVousConfirmes.length }}</div>
+          <p class="stat-label">RDV confirmés</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-amber">⏳</div>
+        <div class="stat-info">
+          <div class="stat-value v-amber">{{ rendezVousEnAttente.length }}</div>
+          <p class="stat-label">En attente</p>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon si-rose">✗</div>
+        <div class="stat-info">
+          <div class="stat-value v-rose">{{ rendezVousRefuses.length }}</div>
+          <p class="stat-label">Refusés</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══ MAIN GRID ═══ -->
+    <div class="main-grid">
+
+      <!-- ── LEFT COLUMN ── -->
+      <div class="left-column">
+
+        <!-- TODAY'S APPOINTMENTS -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Rendez-vous du jour</h2>
+            <a class="view-all">Voir tout</a>
+          </div>
+
+          <div class="tabs">
+            <button type="button" [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
+              En attente ({{ rendezVousEnAttente.length }})
+            </button>
+            <button type="button" [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
+              Confirmés ({{ rendezVousConfirmes.length }})
+            </button>
+            <button type="button" [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
+              Refusés ({{ rendezVousRefuses.length }})
+            </button>
+          </div>
+
+          @if (activeTab === 'attente') {
+          @for (rdv of rendezVousEnAttente; track rdv.id) {
+          <div class="rdv-item">
+            <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
+            <div class="rdv-info">
+              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+              <p class="rdv-type">{{ rdv.motif }}</p>
+            </div>
+            <div class="rdv-actions">
+              <button type="button" class="btn-accept" (click)="accepter(rdv.id)">✓ Accepter</button>
+              <button type="button" class="btn-refuse" (click)="refuser(rdv.id)">✗ Refuser</button>
+            </div>
+            <div class="phone-btn">📞</div>
+          </div>
+          }
+          @if (rendezVousEnAttente.length === 0) {
+          <p class="empty-state">Aucun rendez-vous en attente</p>
+          }
+          }
+
+          @if (activeTab === 'confirme') {
+          @for (rdv of rendezVousConfirmes; track rdv.id) {
+          <div class="rdv-item">
+            <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
+            <div class="rdv-info">
+              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+              <p class="rdv-type">{{ rdv.motif }}</p>
+            </div>
+            <span class="badge-status confirmed">confirmé</span>
+            <div class="phone-btn pink">📞</div>
+          </div>
+          }
+          @if (rendezVousConfirmes.length === 0) {
+          <p class="empty-state">Aucun rendez-vous confirmé</p>
+          }
+          }
+
+          @if (activeTab === 'refuse') {
+          @for (rdv of rendezVousRefuses; track rdv.id) {
+          <div class="rdv-item">
+            <div class="rdv-time-bubble grey">{{ rdv.dateHeure | date:'HH' }}h</div>
+            <div class="rdv-info">
+              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+              <p class="rdv-type">{{ rdv.motif }}</p>
+            </div>
+            <span class="badge-status refused">refusé</span>
+            <div class="phone-btn grey">📞</div>
+          </div>
+          }
+          @if (rendezVousRefuses.length === 0) {
+          <p class="empty-state">Aucun rendez-vous refusé</p>
+          }
+          }
+        </div>
+
+        <!-- RECENT CLIENTS -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Clients récents</h2>
+            <a class="view-all">Voir tout</a>
+          </div>
+
+          @for (c of consultations; track c.id) {
+          <div class="client-item" (click)="openConsultation(c.id)">
+            <div class="client-row">
+              <div class="client-avatar">{{ getInitials(c.userId) }}</div>
+              <div class="client-meta">
+                <p class="client-name">Patient #{{ c.userId }}</p>
+                <p class="client-goal">{{ c.objectif }}</p>
+              </div>
+              <span class="goal-tag">IMC {{ c.imc | number:'1.1-1' }}</span>
+            </div>
+            <div class="progress-bar">
+              <div class="progress-fill" [style.width]="'60%'"></div>
+            </div>
+            <div class="progress-meta">
+              <span>Progression</span>
+              <span>60%</span>
+            </div>
+            <p class="last-visit">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</p>
+          </div>
+          }
+          @if (consultations.length === 0) {
+          <p class="empty-state">Aucune consultation</p>
+          }
+        </div>
+
+        <!-- QUICK ACTIONS -->
+        <div class="quick-actions-grid">
+          <div class="action-card">
+            <div class="action-icon si-sage">📊</div>
+            <div class="action-body">
+              <h3>Plan alimentaire</h3>
+              <p>Créer un plan personnalisé</p>
+            </div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon si-plum">📝</div>
+            <div class="action-body">
+              <h3>Rapports clients</h3>
+              <p>Analyses et progression</p>
+            </div>
+          </div>
+          <div class="action-card">
+            <div class="action-icon si-amber">📚</div>
+            <div class="action-body">
+              <h3>Ressources</h3>
+              <p>Guides et recettes</p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ── RIGHT SIDEBAR ── -->
+      <div class="sidebar">
+
+        <!-- UPCOMING WEEK -->
+        <div class="card">
+          <div class="card-header">
+            <h2>Cette semaine</h2>
+            <a class="view-all">Agenda</a>
+          </div>
+
+          @for (rdv of upcomingRdv; track rdv.id) {
+          <div class="upcoming-item">
+            <div class="up-dot" [class]="rdv.dotColor"></div>
+            <div class="up-info">
+              <div class="up-name">Patient #{{ rdv.userId }}</div>
+              <div class="up-time">{{ rdv.dateHeure | date:'EEE · HH:mm' }}</div>
+            </div>
+            <span class="up-type" [class]="rdv.badgeColor">{{ rdv.motif }}</span>
+          </div>
+          }
+          @if (upcomingRdv.length === 0) {
+          <p class="empty-state">Aucun RDV cette semaine</p>
+          }
+        </div>
+
+      </div>
+    </div>
+
+    <!-- ═══ CONSULTATIONS PATIENTS ═══ -->
+    <div class="card full-width">
+      <div class="card-header">
+        <h2>Consultations Patients</h2>
+      </div>
+
+      @for (c of consultations; track c.id) {
+      <div class="consultation-row">
+        <div class="patient-avatar-sm">{{ getInitials(c.userId) }}</div>
+        <div class="consultation-info">
+          <span class="patient-id">Patient #{{ c.userId }}</span>
+          <span class="consultation-date">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</span>
+          <span class="objectif-tag">{{ c.objectif }}</span>
+        </div>
+        <span class="imc-pill" [class]="imcClass(c.imc)">IMC: {{ c.imc | number:'1.1-1' }}</span>
+        <div class="row-actions">
+          <button type="button" class="btn-sm btn-voir" (click)="openConsultation(c.id)">
+            👁 Voir & Plan
+          </button>
+          <button type="button" class="btn-sm btn-conv" (click)="openConversation(c.userId)">
+            💬 Conversation
+          </button>
+          <button type="button" class="btn-sm btn-rapport" (click)="openRapport(c.id)">
+            📝 Rapport
+          </button>
+        </div>
+      </div>
+      }
+      @if (consultations.length === 0) {
       <p class="empty-state">Aucune consultation</p>
-    }
-  </div>
-</div>
-
-<!-- ═══ CONSULTATIONS PATIENTS ═══ -->
-<div class="card full-width">
-  <div class="card-header">
-    <h2>Consultations Patients</h2>
-  </div>
-
-  @for (c of consultations; track c.id) {
-    <div class="consultation-row" (click)="openConsultation(c.id)">
-      <div class="patient-avatar">P</div>
-      <div class="consultation-info">
-        <span class="patient-id">Patient #{{ c.userId }}</span>
-        <span class="consultation-date">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</span>
-        <span class="objectif-tag">{{ c.objectif }}</span>
-      </div>
-      <span class="imc-pill">IMC: {{ c.imc | number:'1.1-1' }}</span>
-    </div>
-  }
-  @if (consultations.length === 0) {
-    <p class="empty-state">Aucune consultation</p>
-  }
-</div>
-
-<!-- ═══ QUICK ACTIONS ═══ -->
-<div class="quick-actions-grid">
-  <div class="action-card">
-    <div class="action-icon">📊</div>
-    <h3>Create Meal Plan</h3>
-    <p>Design personalized nutrition plans</p>
-  </div>
-  <div class="action-card">
-    <div class="action-icon">📝</div>
-    <h3>Client Reports</h3>
-    <p>View progress and analytics</p>
-  </div>
-  <div class="action-card">
-    <div class="action-icon">📚</div>
-    <h3>Resources</h3>
-    <p>Nutrition guides and recipes</p>
-  </div>
-</div>
-
-<!-- ═══ MODAL CONSULTATION ═══ -->
-@if (showModal && selectedConsultation) {
-  <div class="modal-overlay" (click)="closeModal()">
-    <div class="modal-content" (click)="$event.stopPropagation()">
-      <button class="modal-close" (click)="closeModal()">✕</button>
-      <h3>Détails Consultation</h3>
-      <div class="modal-row"><span>Poids</span><strong>{{ selectedConsultation.poids }} kg</strong></div>
-      <div class="modal-row"><span>Taille</span><strong>{{ selectedConsultation.taille }} m</strong></div>
-      <div class="modal-row"><span>IMC</span><strong>{{ selectedConsultation.imc }}</strong></div>
-      <div class="modal-row"><span>Objectif</span><strong>{{ selectedConsultation.objectif }}</strong></div>
-      <div class="modal-row"><span>Diagnostic</span><strong>{{ selectedConsultation.diagnostic }}</strong></div>
-      <div class="modal-row"><span>Recommandations</span><strong>{{ selectedConsultation.recommandations }}</strong></div>
-      <div class="modal-row"><span>Notes</span><strong>{{ selectedConsultation.notes }}</strong></div>
-      <div class="modal-row"><span>Date consultation</span><strong>{{ selectedConsultation.dateConsultation | date:'dd/MM/yyyy HH:mm' }}</strong></div>
-      @if (selectedConsultation.prochainRdv) {
-        <div class="modal-row"><span>Prochain RDV</span><strong>{{ selectedConsultation.prochainRdv | date:'dd/MM/yyyy' }}</strong></div>
       }
     </div>
+
+  </div><!-- /main-content -->
+</div><!-- /dashboard-wrapper -->
+
+<!-- ═══ CONSULTATION MODAL ═══ -->
+@if (showModal && selectedConsultation) {
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+
+    <div class="modal-header">
+      <div class="modal-patient-info">
+        <div class="modal-avatar">{{ getInitials(selectedConsultation.userId) }}</div>
+        <div>
+          <h3>Patient #{{ selectedConsultation.userId }}</h3>
+          <span class="modal-subtitle">{{ selectedConsultation.dateConsultation | date:'dd/MM/yyyy' }}</span>
+        </div>
+      </div>
+      <button type="button" class="modal-close" (click)="closeModal()">✕</button>
+    </div>
+
+    <div class="modal-tabs">
+      <button type="button" [class.active]="activeModalTab === 'details'" (click)="setModalTab('details')">
+        Détails patient
+      </button>
+      <button type="button" [class.active]="activeModalTab === 'plan'" (click)="setModalTab('plan')">
+        Plan alimentaire
+      </button>
+    </div>
+
+    <!-- TAB DETAILS -->
+    @if (activeModalTab === 'details') {
+    <div class="modal-body">
+      <div class="detail-grid">
+        <div class="detail-card">
+          <span class="detail-label">Poids</span>
+          <strong class="detail-value v-plum">{{ selectedConsultation.poids }} kg</strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">Taille</span>
+          <strong class="detail-value v-plum">{{ selectedConsultation.taille }} m</strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">IMC</span>
+          <strong class="detail-value" [class]="imcClass(selectedConsultation.imc)">
+            {{ selectedConsultation.imc | number:'1.1-1' }}
+          </strong>
+        </div>
+        <div class="detail-card">
+          <span class="detail-label">Objectif</span>
+          <strong class="detail-value">{{ selectedConsultation.objectif }}</strong>
+        </div>
+      </div>
+
+      <div class="detail-section">
+        <div class="detail-row-full">
+          <span class="detail-label">Diagnostic</span>
+          <p class="detail-text">{{ selectedConsultation.diagnostic || '—' }}</p>
+        </div>
+        <div class="detail-row-full">
+          <span class="detail-label">Recommandations</span>
+          <p class="detail-text">{{ selectedConsultation.recommandations || '—' }}</p>
+        </div>
+        <div class="detail-row-full">
+          <span class="detail-label">Notes</span>
+          <p class="detail-text">{{ selectedConsultation.notes || '—' }}</p>
+        </div>
+        @if (selectedConsultation.prochainRdv) {
+        <div class="detail-row-full">
+          <span class="detail-label">Prochain RDV</span>
+          <p class="detail-text">{{ selectedConsultation.prochainRdv | date:'dd/MM/yyyy' }}</p>
+        </div>
+        }
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" class="btn-go-plan" (click)="setModalTab('plan')">
+          Créer plan alimentaire →
+        </button>
+      </div>
+    </div>
+    }
+
+    <!-- TAB PLAN ALIMENTAIRE -->
+    @if (activeModalTab === 'plan') {
+    <div class="modal-body">
+      @if (planSuccess) {
+      <div class="alert-success">✓ {{ planSuccess }}</div>
+      }
+      @if (planError) {
+      <div class="alert-error">⚠ {{ planError }}</div>
+      }
+
+      <p class="section-label">Informations du plan</p>
+      <div class="form-grid-2">
+        <div class="form-group">
+          <label>Nom du plan *</label>
+          <input type="text" [(ngModel)]="planForm.nom" placeholder="Ex: Plan perte de poids S1">
+        </div>
+        <div class="form-group">
+          <label>Calories journalières (kcal)</label>
+          <input type="number" [(ngModel)]="planForm.caloriesJournalieres" placeholder="Ex: 1800">
+        </div>
+        <div class="form-group">
+          <label>Date début</label>
+          <input type="date" [(ngModel)]="planForm.dateDebut">
+        </div>
+        <div class="form-group">
+          <label>Date fin</label>
+          <input type="date" [(ngModel)]="planForm.dateFin">
+        </div>
+        <div class="form-group form-full">
+          <label>Objectif</label>
+          <select [(ngModel)]="planForm.objectif">
+            @for (opt of objectifOptions; track opt) {
+            <option [value]="opt">{{ opt }}</option>
+            }
+          </select>
+        </div>
+        <div class="form-group form-full">
+          <label>Description</label>
+          <textarea [(ngModel)]="planForm.description" rows="2"
+            placeholder="Contexte et objectifs du plan..."></textarea>
+        </div>
+      </div>
+
+      <div class="repas-header">
+        <p class="section-label" style="margin:0">Repas du plan</p>
+        <button type="button" class="btn-add-repas" (click)="addRepas()">+ Ajouter repas</button>
+      </div>
+
+      @for (repas of planForm.repas; track $index; let i = $index) {
+      <div class="repas-card">
+        <div class="repas-card-top">
+          <select [(ngModel)]="repas.typeRepas" class="repas-type-select">
+            @for (t of repasTypeOptions; track t) {
+            <option [value]="t">{{ t }}</option>
+            }
+          </select>
+          <button type="button" class="btn-remove-repas" (click)="removeRepas(i)">Supprimer</button>
+        </div>
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label>Nom du repas</label>
+            <input type="text" [(ngModel)]="repas.nom" placeholder="Ex: Salade niçoise">
+          </div>
+          <div class="form-group">
+            <label>Aliments</label>
+            <input type="text" [(ngModel)]="repas.aliments" placeholder="Poulet, riz, légumes...">
+          </div>
+        </div>
+        <div class="form-grid-4">
+          <div class="form-group">
+            <label>Calories (kcal)</label>
+            <input type="number" [(ngModel)]="repas.calories" placeholder="450">
+          </div>
+          <div class="form-group">
+            <label>Protéines (g)</label>
+            <input type="number" [(ngModel)]="repas.proteines" placeholder="35">
+          </div>
+          <div class="form-group">
+            <label>Glucides (g)</label>
+            <input type="number" [(ngModel)]="repas.glucides" placeholder="40">
+          </div>
+          <div class="form-group">
+            <label>Lipides (g)</label>
+            <input type="number" [(ngModel)]="repas.lipides" placeholder="12">
+          </div>
+        </div>
+        <div class="form-group" style="margin-top:8px">
+          <label>Notes</label>
+          <input type="text" [(ngModel)]="repas.notes" placeholder="Sans gluten, sans lactose...">
+        </div>
+      </div>
+      }
+
+      <div class="modal-actions">
+        <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
+        <button type="button" class="btn-save-plan" (click)="savePlan()" [disabled]="planLoading">
+          @if (planLoading) { Enregistrement... } @else { Enregistrer le plan }
+        </button>
+      </div>
+    </div>
+    }
+
   </div>
+</div>
+}
+
+<!-- ═══ RAPPORT MODAL ═══ -->
+@if (showRapportModal && rapportConsultation) {
+<div class="modal-overlay" (click)="closeRapportModal()">
+  <div class="modal-content rapport-modal-content" (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="modal-header">
+      <div class="modal-patient-info">
+        <div class="modal-avatar rapport-avatar">{{ getInitials(rapportConsultation.userId) }}</div>
+        <div>
+          <h3>Rapport · Patient #{{ rapportConsultation.userId }}</h3>
+          <span class="modal-subtitle">Consultation du {{ rapportConsultation.dateConsultation | date:'dd/MM/yyyy'
+            }}</span>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;align-items:center">
+        <button type="button" class="btn-print-rapport" (click)="printRapport()">🖨 Imprimer</button>
+        <button type="button" class="modal-close" (click)="closeRapportModal()">✕</button>
+      </div>
+    </div>
+
+    <div class="modal-body rapport-body">
+
+      <!-- ── SECTION 1: Données biométriques ── -->
+      <div class="rapport-section">
+        <div class="rapport-section-title">
+          <span class="rapport-section-icon">📏</span>
+          Données biométriques
+        </div>
+        <div class="rapport-biometrie-grid">
+          <div class="rapport-metric-card">
+            <span class="rapport-metric-label">Poids actuel</span>
+            <span class="rapport-metric-value v-plum">{{ rapportConsultation.poids }} kg</span>
+          </div>
+          <div class="rapport-metric-card">
+            <span class="rapport-metric-label">Taille</span>
+            <span class="rapport-metric-value v-plum">{{ rapportConsultation.taille }} m</span>
+          </div>
+          <div class="rapport-metric-card">
+            <span class="rapport-metric-label">IMC</span>
+            <span class="rapport-metric-value" [class]="imcClass(rapportConsultation.imc)">
+              {{ rapportConsultation.imc | number:'1.1-1' }}
+            </span>
+            <span class="rapport-imc-label" [class]="imcClass(rapportConsultation.imc)">
+              {{ imcLabel(rapportConsultation.imc) }}
+            </span>
+          </div>
+          <div class="rapport-metric-card">
+            <span class="rapport-metric-label">Objectif</span>
+            <span class="rapport-metric-value rapport-objectif-text">{{ rapportConsultation.objectif }}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 2: Macronutriments ── -->
+      <div class="rapport-section">
+        <div class="rapport-section-title">
+          <span class="rapport-section-icon">🥗</span>
+          Macronutriments · Plan actif
+        </div>
+        <div class="rapport-macros-row">
+          <div class="rapport-macro-block">
+            <div class="rapport-macro-bar-wrap">
+              <div class="rapport-macro-bar" style="height:70%;background:var(--c-plum)"></div>
+            </div>
+            <span class="rapport-macro-val v-plum">125g</span>
+            <span class="rapport-macro-lbl">Protéines</span>
+          </div>
+          <div class="rapport-macro-block">
+            <div class="rapport-macro-bar-wrap">
+              <div class="rapport-macro-bar" style="height:55%;background:var(--c-sage)"></div>
+            </div>
+            <span class="rapport-macro-val v-sage">180g</span>
+            <span class="rapport-macro-lbl">Glucides</span>
+          </div>
+          <div class="rapport-macro-block">
+            <div class="rapport-macro-bar-wrap">
+              <div class="rapport-macro-bar" style="height:30%;background:var(--c-amber)"></div>
+            </div>
+            <span class="rapport-macro-val v-amber">55g</span>
+            <span class="rapport-macro-lbl">Lipides</span>
+          </div>
+          <div class="rapport-macro-block rapport-macro-kcal">
+            <div class="rapport-macro-bar-wrap">
+              <div class="rapport-macro-bar" style="height:90%;background:var(--c-rose)"></div>
+            </div>
+            <span class="rapport-macro-val v-rose">1650</span>
+            <span class="rapport-macro-lbl">Kcal/jour</span>
+          </div>
+        </div>
+        <p class="rapport-macro-note">Objectif journalier recommandé · Plan alimentaire actif</p>
+      </div>
+
+      <!-- ── SECTION 3: Évolution du poids ── -->
+      <div class="rapport-section">
+        <div class="rapport-section-title">
+          <span class="rapport-section-icon">📉</span>
+          Évolution du poids
+        </div>
+        <div class="rapport-weight-chart">
+          <svg viewBox="0 0 480 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+            style="width:100%;height:80px;display:block">
+            <defs>
+              <linearGradient id="rwg" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#52B788" stop-opacity="0.25" />
+                <stop offset="100%" stop-color="#52B788" stop-opacity="0" />
+              </linearGradient>
+            </defs>
+            <path
+              d="M0,62 C30,60 60,64 100,58 C140,52 170,56 210,48 C250,40 280,44 320,36 C360,28 400,32 440,22 C460,18 470,16 480,14"
+              fill="none" stroke="#52B788" stroke-width="2.5" stroke-linecap="round" />
+            <path
+              d="M0,62 C30,60 60,64 100,58 C140,52 170,56 210,48 C250,40 280,44 320,36 C360,28 400,32 440,22 C460,18 470,16 480,14 L480,80 L0,80 Z"
+              fill="url(#rwg)" />
+            <circle cx="480" cy="14" r="5" fill="#52B788" />
+            <circle cx="0" cy="62" r="3.5" fill="#52B788" opacity="0.4" />
+          </svg>
+        </div>
+        <div class="rapport-weight-meta">
+          <div class="rapport-weight-item">
+            <span class="rapport-weight-label">Poids initial</span>
+            <span class="rapport-weight-val">{{ rapportConsultation.poids + 6 }} kg</span>
+          </div>
+          <div class="rapport-weight-progress">
+            <span class="rapport-weight-badge">↓ 6 kg perdus</span>
+            <span class="rapport-weight-pct">Objectif atteint à 82%</span>
+          </div>
+          <div class="rapport-weight-item" style="text-align:right">
+            <span class="rapport-weight-label">Poids actuel</span>
+            <span class="rapport-weight-val weight-now">{{ rapportConsultation.poids }} kg</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── SECTION 4: Notes cliniques ── -->
+      <div class="rapport-section">
+        <div class="rapport-section-title">
+          <span class="rapport-section-icon">📋</span>
+          Notes cliniques
+        </div>
+        <div class="rapport-notes-grid">
+          <div class="rapport-note-block">
+            <span class="rapport-note-label">Diagnostic</span>
+            <p class="rapport-note-text">{{ rapportConsultation.diagnostic || 'Aucun diagnostic renseigné.' }}</p>
+          </div>
+          <div class="rapport-note-block">
+            <span class="rapport-note-label">Recommandations</span>
+            <p class="rapport-note-text">{{ rapportConsultation.recommandations || 'Aucune recommandation renseignée.'
+              }}</p>
+          </div>
+          <div class="rapport-note-block rapport-note-full">
+            <span class="rapport-note-label">Notes complémentaires</span>
+            <p class="rapport-note-text">{{ rapportConsultation.notes || 'Aucune note.' }}</p>
+          </div>
+          @if (rapportConsultation.prochainRdv) {
+          <div class="rapport-note-block">
+            <span class="rapport-note-label">Prochain rendez-vous</span>
+            <p class="rapport-note-text">{{ rapportConsultation.prochainRdv | date:'dd MMMM yyyy' }}</p>
+          </div>
+          }
+        </div>
+      </div>
+
+    </div><!-- /rapport-body -->
+  </div>
+</div>
 }

@@ -5,7 +5,7 @@ import { Consultation } from '../../interfaces/consultation';
 
 @Injectable({ providedIn: 'root' })
 export class ConsultationService {
-  private api = 'http://localhost:8085/api/consultations';
+  private api = 'http://localhost:8084/api/consultations';
 
   constructor(private http: HttpClient) {}
 

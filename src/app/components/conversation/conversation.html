@@ -1,0 +1,189 @@
+<div class="conv-layout">
+
+  <!-- ══════════════════════════════════════════════
+       LEFT PANEL — conversation list
+  ══════════════════════════════════════════════ -->
+  <aside class="conv-sidebar">
+
+    <div class="conv-sidebar-header">
+      <div class="conv-sidebar-title">
+        <span class="conv-title-icon">💬</span>
+        Conversations
+      </div>
+      <button class="btn-new-conv" (click)="openNewConvModal()">+</button>
+    </div>
+
+    <div class="conv-search-wrap">
+      <span class="conv-search-icon">🔍</span>
+      <input
+        class="conv-search"
+        type="text"
+        placeholder="Rechercher…"
+        [(ngModel)]="searchQuery"
+      />
+    </div>
+
+    <div class="conv-list" #convListEl>
+      @for (conv of filteredConversations; track conv.id) {
+        <div
+          class="conv-item"
+          [class.active]="selectedConv?.id === conv.id"
+          [class.closed]="conv.status === 'CLOSED'"
+          (click)="selectConversation(conv)"
+        >
+          <div class="conv-item-avatar" [class]="avatarColor(conv.id)">
+            {{ getOtherLabel(conv) }}
+          </div>
+          <div class="conv-item-body">
+            <div class="conv-item-top">
+              <span class="conv-item-name">{{ getOtherLabel(conv) }}</span>
+              <span class="conv-item-time">{{ conv.updatedAt | date:'HH:mm' }}</span>
+            </div>
+            <div class="conv-item-bottom">
+              <span class="conv-item-preview">{{ lastMessage(conv) }}</span>
+              @if (conv.status === 'CLOSED') {
+                <span class="conv-badge closed">Fermée</span>
+              } @else {
+                <span class="conv-badge active">Active</span>
+              }
+            </div>
+          </div>
+        </div>
+      }
+      @if (filteredConversations.length === 0) {
+        <p class="conv-empty">Aucune conversation trouvée</p>
+      }
+    </div>
+
+  </aside>
+
+  <!-- ══════════════════════════════════════════════
+       RIGHT PANEL — message thread
+  ══════════════════════════════════════════════ -->
+  <section class="conv-thread">
+
+    @if (!selectedConv) {
+      <!-- Empty state -->
+      <div class="conv-thread-empty">
+        <div class="conv-thread-empty-icon">💬</div>
+        <h3>Sélectionnez une conversation</h3>
+        <p>Choisissez une conversation à gauche ou créez-en une nouvelle.</p>
+        <button class="btn-start-conv" (click)="openNewConvModal()">+ Nouvelle conversation</button>
+      </div>
+    } @else {
+
+      <!-- Thread header -->
+      <div class="conv-thread-header">
+        <div class="conv-thread-user">
+          <div class="conv-thread-avatar" [class]="avatarColor(selectedConv.id)">
+            {{ getOtherLabel(selectedConv) }}
+          </div>
+          <div class="conv-thread-meta">
+            <span class="conv-thread-name">{{ getOtherLabel(selectedConv) }}</span>
+            <span class="conv-thread-status" [class.status-active]="selectedConv.status === 'ACTIVE'">
+              {{ selectedConv.status === 'ACTIVE' ? '● En ligne' : '○ Fermée' }}
+            </span>
+          </div>
+        </div>
+        <div class="conv-thread-actions">
+          @if (selectedConv.status === 'ACTIVE') {
+            <button class="btn-close-conv" (click)="closeConversation(selectedConv.id)">
+              Fermer la conv.
+            </button>
+          }
+          <button class="btn-delete-conv" (click)="deleteConversation(selectedConv.id)">
+            🗑
+          </button>
+        </div>
+      </div>
+
+      <!-- Messages -->
+      <div class="conv-messages" #messagesEl>
+        @if (loadingMessages) {
+          <div class="conv-messages-loading">Chargement…</div>
+        }
+        @for (msg of messages; track msg.id) {
+          <div class="msg-row" [class.msg-mine]="isMine(msg)" [class.msg-theirs]="!isMine(msg)">
+            @if (!isMine(msg)) {
+              <div class="msg-avatar-sm" [class]="avatarColor(selectedConv.id)">
+                {{ senderInitial(msg) }}
+              </div>
+            }
+            <div class="msg-bubble-wrap">
+              <div class="msg-bubble" [class.mine]="isMine(msg)" [class.theirs]="!isMine(msg)">
+                {{ msg.content }}
+              </div>
+              <div class="msg-meta" [class.msg-meta-right]="isMine(msg)">
+                <span class="msg-time">{{ msg.sentAt | date:'HH:mm' }}</span>
+                @if (isMine(msg)) {
+                  <span class="msg-read">{{ msg.isRead ? '✓✓' : '✓' }}</span>
+                }
+              </div>
+            </div>
+          </div>
+        }
+        @if (messages.length === 0 && !loadingMessages) {
+          <div class="conv-no-messages">
+            Aucun message. Commencez la conversation !
+          </div>
+        }
+      </div>
+
+      <!-- Input bar -->
+      <div class="conv-input-bar" [class.disabled]="selectedConv.status !== 'ACTIVE'">
+        @if (selectedConv.status !== 'ACTIVE') {
+          <p class="conv-closed-notice">Cette conversation est fermée. Impossible d'envoyer des messages.</p>
+        } @else {
+          <textarea
+            class="conv-input"
+            placeholder="Écrire un message…"
+            [(ngModel)]="newMessage"
+(keydown.enter)="onEnterKey($any($event))"            rows="1"
+          ></textarea>
+          <button
+            class="btn-send"
+            [disabled]="!newMessage.trim() || sendingMessage"
+            (click)="sendMessage()"
+          >
+            @if (sendingMessage) { ⏳ } @else { ➤ }
+          </button>
+        }
+      </div>
+
+    }
+  </section>
+
+</div>
+
+<!-- ══════════════════════════════════════════════
+     MODAL — New conversation
+══════════════════════════════════════════════ -->
+@if (showNewConvModal) {
+  <div class="modal-overlay" (click)="closeNewConvModal()">
+    <div class="modal-box" (click)="$event.stopPropagation()">
+      <div class="modal-box-header">
+        <h3>Nouvelle conversation</h3>
+        <button class="modal-close" (click)="closeNewConvModal()">✕</button>
+      </div>
+      <div class="modal-box-body">
+        @if (newConvError) {
+          <div class="alert-error">⚠ {{ newConvError }}</div>
+        }
+        <div class="form-group">
+          <label>ID Patient</label>
+          <input type="number" [(ngModel)]="newConvPatientId" placeholder="Ex: 3">
+        </div>
+        <div class="form-group">
+          <label>ID Nutritionniste</label>
+          <input type="number" [(ngModel)]="newConvNutritionistId" placeholder="Ex: 1">
+        </div>
+      </div>
+      <div class="modal-box-footer">
+        <button class="btn-cancel-sm" (click)="closeNewConvModal()">Annuler</button>
+        <button class="btn-create-conv" [disabled]="creatingConv" (click)="createConversation()">
+          @if (creatingConv) { Création… } @else { Créer }
+        </button>
+      </div>
+    </div>
+  </div>
+}
