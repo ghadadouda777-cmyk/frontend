@@ -1,0 +1,303 @@
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.page {
+  background: #f5f0ff;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 2rem 1rem;
+}
+
+.card {
+  background: white;
+  border-radius: 24px;
+  padding: 2.5rem 2rem;
+  width: 100%;
+  max-width: 600px;
+  box-shadow: 0 8px 40px rgba(168, 85, 247, 0.10);
+}
+
+/* ── Logo ── */
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 1rem;
+}
+
+.logo-icon {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  border-radius: 10px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 800;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+h1 {
+  font-size: 2.2rem;
+  font-weight: 900;
+  text-align: center;
+  background: linear-gradient(90deg, #a855f7, #ec4899);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 6px;
+}
+
+.subtitle {
+  text-align: center;
+  color: #888;
+  font-size: 0.92rem;
+  margin-bottom: 1.6rem;
+}
+
+/* ── Section label ── */
+.section-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  color: #ec4899;
+  margin: 1.4rem 0 0.8rem;
+  padding-bottom: 6px;
+  border-bottom: 1.5px solid #fce7ff;
+}
+
+/* ── Plan grid ── */
+.plan-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.plan-card {
+  border: 2px solid #e8d5f5;
+  border-radius: 14px;
+  padding: 1rem;
+  cursor: pointer;
+  background: #fdf8ff;
+  transition: all 0.2s;
+  position: relative;
+}
+
+.plan-card:hover {
+  border-color: #c87ee8;
+  transform: translateY(-2px);
+}
+
+.plan-card.selected {
+  border-color: #a855f7;
+  background: linear-gradient(135deg, #fdf4ff, #fce7ff);
+  box-shadow: 0 2px 12px rgba(168, 85, 247, 0.15);
+}
+
+.plan-check {
+  position: absolute;
+  top: 10px;
+  right: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  background: white;
+  transition: all 0.2s;
+}
+
+.plan-card.selected .plan-check {
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  border-color: transparent;
+}
+
+.plan-card.selected .plan-check::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 6px;
+  background: white;
+  border-radius: 50%;
+  margin: 5px auto 0;
+}
+
+.plan-duration {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: #a855f7;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 4px;
+}
+
+.plan-price {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #1a1a2e;
+}
+
+.plan-price span {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #888;
+}
+
+.plan-save {
+  font-size: 0.75rem;
+  color: #ec4899;
+  font-weight: 600;
+  margin-top: 2px;
+}
+
+/* ── Form fields ── */
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-top: 1rem;
+}
+
+label {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 6px;
+}
+
+input {
+  width: 100%;
+  border: 1.5px solid #e8d5f5;
+  border-radius: 12px;
+  padding: 0.72rem 1rem;
+  font-size: 0.92rem;
+  color: #333;
+  background: #fdf8ff;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+input:focus {
+  border-color: #c87ee8;
+  box-shadow: 0 0 0 3px rgba(200, 126, 232, 0.12);
+}
+
+input::placeholder { color: #bba0d0; }
+
+/* Card number with icon */
+.input-icon-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.card-icon {
+  position: absolute;
+  left: 12px;
+  font-size: 1rem;
+  pointer-events: none;
+}
+
+.input-icon-wrap input {
+  padding-left: 2.4rem;
+}
+
+/* Expiry + CVV side by side */
+.row-two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+/* ── Messages ── */
+.error-msg {
+  color: #ef4444;
+  font-size: 0.84rem;
+  text-align: center;
+  background: #fff1f1;
+  border-radius: 10px;
+  padding: 9px 14px;
+  margin-top: 14px;
+}
+
+.success-msg {
+  color: #16a34a;
+  font-size: 0.84rem;
+  text-align: center;
+  background: #f0fdf4;
+  border-radius: 10px;
+  padding: 9px 14px;
+  margin-top: 14px;
+}
+
+/* ── Subscribe button ── */
+.btn-subscribe {
+  width: 100%;
+  background: linear-gradient(90deg, #2ecc71, #27ae60);
+  color: white;
+  border: none;
+  border-radius: 14px;
+  padding: 1rem;
+  font-size: 1rem;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 1.6rem;
+  margin-bottom: 1rem;
+  transition: opacity 0.2s, transform 0.1s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 52px;
+}
+
+.btn-subscribe:hover:not(:disabled) {
+  opacity: 0.92;
+  transform: translateY(-1px);
+}
+
+.btn-subscribe:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* ── Spinner ── */
+.spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(255,255,255,0.35);
+  border-top-color: #fff;
+  border-radius: 50%;
+  animation: spin 0.7s linear infinite;
+  display: inline-block;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Login link ── */
+.login-link {
+  text-align: center;
+  font-size: 0.88rem;
+  color: #888;
+  margin: 0;
+}
+
+.login-link a {
+  color: #c87ee8;
+  font-weight: 700;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.login-link a:hover { text-decoration: underline; }

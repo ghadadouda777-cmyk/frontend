@@ -1,1 +1,286 @@
-<p>patient-dashboard works!</p>
+<!-- ═══ HEADER ═══ -->
+<div class="dashboard-header">
+  <div class="header-left">
+    <h1 class="dashboard-title">Bloomer <span>Dashboard</span></h1>
+    <p class="welcome-text">Bienvenue ! 👋</p>
+  </div>
+  <div class="header-right">
+    <button class="btn-new-rdv" (click)="goToPrendreRdv()">+ Prendre RDV</button>
+    <div class="avatar-icon">👤</div>
+  </div>
+</div>
+
+<!-- ═══ STATS ═══ -->
+<div class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon teal">⚖️</div>
+    <div class="stat-info">
+      <div class="stat-badge teal">{{ derniereConsultation?.poids ?? '—' }}</div>
+      <p class="stat-label">Poids (kg)</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon blue">📅</div>
+    <div class="stat-info">
+      <div class="stat-badge blue">{{ rdvConfirmes.length }}</div>
+      <p class="stat-label">RDV Confirmés</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon orange">🥗</div>
+    <div class="stat-info">
+      <div class="stat-badge orange">{{ consultations.length }}</div>
+      <p class="stat-label">Consultations</p>
+    </div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon green">📊</div>
+    <div class="stat-info">
+      <div class="stat-badge green">
+        {{ derniereConsultation ? (derniereConsultation.imc | number : '1.1-1') : '—' }}
+      </div>
+      <p class="stat-label">IMC</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ MAIN GRID ═══ -->
+<div class="main-grid">
+  <!-- LEFT : Mes Rendez-Vous -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Mes Rendez-Vous</h2>
+      <a class="view-all">Voir tout</a>
+    </div>
+
+    <div class="tabs">
+      <button [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
+        En attente ({{ rdvEnAttente.length }})
+      </button>
+      <button [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
+        Confirmés ({{ rdvConfirmes.length }})
+      </button>
+      <button [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
+        Refusés ({{ rdvRefuses.length }})
+      </button>
+    </div>
+
+    @if (activeTab === 'attente') { @for (rdv of rdvEnAttente; track rdv.id) {
+    <div class="rdv-item">
+      <div class="rdv-time-bubble amber">
+        {{ rdv.dateHeure | date : 'dd' }}
+      </div>
+      <div class="rdv-info">
+        <p class="rdv-name">Consultation nutritionnelle</p>
+        <p class="rdv-type">{{ rdv.motif }}</p>
+        <p class="rdv-hour">🕐 {{ rdv.dateHeure | date : 'HH:mm' }}</p>
+      </div>
+      <span class="badge-status pending">En attente</span>
+      <div class="phone-btn">📞</div>
+    </div>
+    } @if (rdvEnAttente.length === 0) {
+    <p class="empty-state">Aucun rendez-vous en attente</p>
+    } } @if (activeTab === 'confirme') { @for (rdv of rdvConfirmes; track rdv.id) {
+    <div class="rdv-item">
+      <div class="rdv-time-bubble green">
+        {{ rdv.dateHeure | date : 'dd' }}
+      </div>
+      <div class="rdv-info">
+        <p class="rdv-name">Consultation nutritionnelle</p>
+        <p class="rdv-type">{{ rdv.motif }}</p>
+        <p class="rdv-hour">🕐 {{ rdv.dateHeure | date : 'HH:mm' }}</p>
+      </div>
+      <span class="badge-status confirmed">Confirmé ✓</span>
+      <div class="phone-btn pink">📞</div>
+    </div>
+    } @if (rdvConfirmes.length === 0) {
+    <p class="empty-state">Aucun rendez-vous confirmé</p>
+    } } @if (activeTab === 'refuse') { @for (rdv of rdvRefuses; track rdv.id) {
+    <div class="rdv-item">
+      <div class="rdv-time-bubble grey">
+        {{ rdv.dateHeure | date : 'dd' }}
+      </div>
+      <div class="rdv-info">
+        <p class="rdv-name">Consultation nutritionnelle</p>
+        <p class="rdv-type">{{ rdv.motif }}</p>
+        <p class="rdv-hour">🕐 {{ rdv.dateHeure | date : 'HH:mm' }}</p>
+      </div>
+      <span class="badge-status refused">Refusé ✗</span>
+      <div class="phone-btn grey">📞</div>
+    </div>
+    } @if (rdvRefuses.length === 0) {
+    <p class="empty-state">Aucun rendez-vous refusé</p>
+    } }
+  </div>
+
+  <!-- RIGHT : Mon Suivi -->
+  <div class="card">
+    <div class="card-header">
+      <h2>Mon Suivi</h2>
+    </div>
+
+    @if (derniereConsultation) {
+    <div class="suivi-row">
+      <span class="suivi-label">Objectif</span>
+      <span class="suivi-val goal">🎯 {{ derniereConsultation.objectif }}</span>
+    </div>
+    <div class="suivi-row">
+      <span class="suivi-label">Diagnostic</span>
+      <span class="suivi-val">{{ derniereConsultation.diagnostic }}</span>
+    </div>
+    <div class="suivi-row">
+      <span class="suivi-label">Recommandations</span>
+      <span class="suivi-val small">{{ derniereConsultation.recommandations }}</span>
+    </div>
+    <div class="suivi-row">
+      <span class="suivi-label">Prochain RDV</span>
+      <span class="suivi-val date">
+        📆
+        {{
+          derniereConsultation.prochainRdv
+            ? (derniereConsultation.prochainRdv | date : 'dd/MM/yyyy')
+            : 'Non défini'
+        }}
+      </span>
+    </div>
+    <div class="imc-gauge">
+      <div class="gauge-header">
+        <span class="gauge-label">IMC</span>
+        <strong class="gauge-val">{{ derniereConsultation.imc | number : '1.1-1' }}</strong>
+        <span class="gauge-tag">{{ getImcLabel() }}</span>
+      </div>
+      <div class="gauge-bar">
+        <div class="gauge-fill" [style.width]="getImcPercent()"></div>
+      </div>
+      <div class="gauge-range">
+        <span>16</span><span>18.5</span><span>25</span><span>30</span><span>40</span>
+      </div>
+    </div>
+    } @else {
+    <p class="empty-state">Aucune consultation disponible</p>
+    }
+  </div>
+</div>
+
+<!-- ═══ SUIVI QUOTIDIEN ═══ -->
+<div class="tracking-grid">
+  <div class="tracking-card">
+    <div class="tracking-icon">💧</div>
+    <h3>Hydratation</h3>
+    <div class="tracking-value">1.8 <span>/ 2.5 L</span></div>
+    <div class="tracking-bar">
+      <div class="tracking-fill water" style="width: 72%"></div>
+    </div>
+    <p class="tracking-sub">72% de l'objectif quotidien</p>
+  </div>
+  <div class="tracking-card">
+    <div class="tracking-icon">🏃</div>
+    <h3>Activité Sportive</h3>
+    <div class="tracking-value">3 <span>/ 5 séances</span></div>
+    <div class="tracking-bar">
+      <div class="tracking-fill sport" style="width: 60%"></div>
+    </div>
+    <p class="tracking-sub">3 séances cette semaine</p>
+  </div>
+  <div class="tracking-card">
+    <div class="tracking-icon">🥗</div>
+    <h3>Alimentation</h3>
+    <div class="tracking-value">78 <span>% healthy</span></div>
+    <div class="tracking-bar">
+      <div class="tracking-fill food" style="width: 78%"></div>
+    </div>
+    <p class="tracking-sub">Repas enregistrés aujourd'hui</p>
+  </div>
+  <div class="tracking-card">
+    <div class="tracking-icon">😴</div>
+    <h3>Sommeil</h3>
+    <div class="tracking-value">7h <span>/ 8h</span></div>
+    <div class="tracking-bar">
+      <div class="tracking-fill sleep" style="width: 87%"></div>
+    </div>
+    <p class="tracking-sub">Bonne récupération</p>
+  </div>
+</div>
+
+<!-- ═══ HISTORIQUE CONSULTATIONS ═══ -->
+<div class="card full-width">
+  <div class="card-header">
+    <h2>Historique des Consultations</h2>
+    <span class="count-badge">{{ consultations.length }}</span>
+  </div>
+
+  @for (c of consultations; track c.id) {
+  <div class="consultation-row" (click)="openConsultation(c.id)">
+    <div class="patient-avatar">B</div>
+    <div class="consultation-info">
+      <span class="patient-id">Consultation #{{ c.id }}</span>
+      <span class="consultation-date">{{ c.dateConsultation | date : 'dd/MM/yyyy' }}</span>
+      <span class="objectif-tag">{{ c.objectif }}</span>
+    </div>
+    <span class="imc-pill">IMC : {{ c.imc | number : '1.1-1' }}</span>
+    <span class="arrow">›</span>
+  </div>
+  } @if (consultations.length === 0) {
+  <p class="empty-state">Aucune consultation dans l'historique</p>
+  }
+</div>
+
+<!-- ═══ ACTIONS RAPIDES ═══ -->
+<div class="quick-actions-grid">
+  <div class="action-card" (click)="goToPrendreRdv()">
+    <div class="action-icon">📅</div>
+    <h3>Prendre RDV</h3>
+    <p>Réserver avec votre nutritionniste</p>
+  </div>
+  <div class="action-card">
+    <div class="action-icon">🥗</div>
+    <h3>Mon Plan Alimentaire</h3>
+    <p>Consulter votre régime personnalisé</p>
+  </div>
+  <div class="action-card" (click)="goToMessages()">
+    <div class="action-icon">💬</div>
+    <h3>Messages</h3>
+    <p>Contacter mon nutritionniste</p>
+  </div>
+</div>
+
+<!-- ═══ MODAL CONSULTATION ═══ -->
+@if (showModal && selectedConsultation) {
+<div class="modal-overlay" (click)="closeModal()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <button class="modal-close" (click)="closeModal()">✕</button>
+    <h3>Détails Consultation</h3>
+    <div class="modal-row">
+      <span>Poids</span><strong>{{ selectedConsultation.poids }} kg</strong>
+    </div>
+    <div class="modal-row">
+      <span>Taille</span><strong>{{ selectedConsultation.taille }} m</strong>
+    </div>
+    <div class="modal-row">
+      <span>IMC</span><strong>{{ selectedConsultation.imc | number : '1.1-1' }}</strong>
+    </div>
+    <div class="modal-row">
+      <span>Objectif</span><strong>{{ selectedConsultation.objectif }}</strong>
+    </div>
+    <div class="modal-row">
+      <span>Diagnostic</span><strong>{{ selectedConsultation.diagnostic }}</strong>
+    </div>
+    <div class="modal-row">
+      <span>Recommandations</span><strong>{{ selectedConsultation.recommandations }}</strong>
+    </div>
+    <div class="modal-row">
+      <span>Notes</span><strong>{{ selectedConsultation.notes }}</strong>
+    </div>
+    <div class="modal-row">
+      <span>Date</span
+      ><strong>{{ selectedConsultation.dateConsultation | date : 'dd/MM/yyyy HH:mm' }}</strong>
+    </div>
+    @if (selectedConsultation.prochainRdv) {
+    <div class="modal-row">
+      <span>Prochain RDV</span>
+      <strong>{{ selectedConsultation.prochainRdv | date : 'dd/MM/yyyy' }}</strong>
+    </div>
+    }
+  </div>
+</div>
+}
