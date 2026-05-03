@@ -1,110 +1,127 @@
+<div class="page">
+  <div class="card">
 
-<div>
-    <div>
-        
-    </div>
-<h1>
-    Join HealthFlow
-</h1>
-<span>Subscribe as a Nutritionist🥗</span>
-
-<form action="">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-    <div>
-        <label>First Name</label>
-        <input type="text" placeholder="name">
-    </div>
-    <div>
-        <label>Last Name</label>
-        <input type="text" placeholder="Family name">
-    </div>
-</div>
-
-    <label for="">Email Address</label>
-    <input type="email" placeholder="nutritionist@exemple.com">
-
-
-    <label for="">Phone Number</label>
-    <input type="tel"  placeholder="phone number">
-
-
-    <label for="">Location</label>
-    <input type="text" placeholder="City,State/Country">
-
-
-    <label for="">Speciality</label>
-    <select name="" id="">
-        <option value="">Select your speciality</option>
-        <option value="">Weight Loss</option>
-        <option value="">Sports nutrition</option>
-        <option value="">Clinical Nutrition</option>
-        <option value="">Hospital Nutrition</option>
-        <option value="">Pediatric Nutrition</option>
-        <option value="">Other</option>
-
-    </select>
-    <!-- ------------------------------- -->
-
-<div class="plans-section">
-    <p class="plans-label">Subscription Plan *</p>
-    <div class="plans-grid">
- 
-      <div class="plan-card selected">
-        <div class="icon">📅</div>
-        <p class="name">1 Month</p>
-        <p class="price">300dt/mois</p>
-        <p class="total">Total: 300dt</p>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14h-2v-5h2v5zm0-7h-2V7h2v2z"/>
+        </svg>
       </div>
- 
-      <div class="plan-card">
-        <span class="badge badge-green">Save 17%</span>
-        <div class="icon">📅</div>
-        <p class="name">3 Months</p>
-        <p class="price">250dt/mois</p>
-        <p class="total">Total: 750dt</p>
-      </div>
- 
-      <div class="plan-card" >
-        <span class="badge badge-orange">Save 27%</span>
-        <div class="icon">📊</div>
-        <p class="name">6 Months</p>
-        <p class="price">220dt/mois</p>
-        <p class="total">Total: 1320dt</p>
-      </div>
- 
-      <div class="plan-card" >
-        <span class="badge badge-purple">Save 40%</span>
-        <div class="icon">⭐</div>
-        <p class="name">1 Year</p>
-        <p class="price">180dt/mois</p>
-        <p class="total">Total: 2160dt</p>
-      </div>
- 
+      <span class="logo-text">HealthFlow</span>
     </div>
+
+    <h1>Join HealthFlow</h1>
+    <p class="subtitle">Subscribe as a Nutritionist 🥗</p>
+
+    <form #inscritForm="ngForm">
+
+      <p class="section-label">Personal info</p>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label>First name</label>
+          <input type="text" [(ngModel)]="formData.prenom" name="prenom" placeholder="First name" required>
+        </div>
+        <div class="col-md-6">
+          <label>Last name</label>
+          <input type="text" [(ngModel)]="formData.nom" name="nom" placeholder="Last name" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" [(ngModel)]="formData.email" name="email" placeholder="nutritionist@example.com" required>
+      </div>
+
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" [(ngModel)]="formData.tel" name="tel" placeholder="+216 XX XXX XXX">
+      </div>
+
+      <div class="field">
+        <label>Location</label>
+        <input type="text" [(ngModel)]="formData.localisation" name="localisation" placeholder="City, State / Country">
+      </div>
+
+      <p class="section-label">Professional info</p>
+
+      <div class="field">
+        <label>Speciality</label>
+        <select [(ngModel)]="formData.specialite" name="specialite">
+          <option value="">Select your speciality</option>
+          <option value="WEIGHT_LOSS">Weight Loss</option>
+          <option value="SPORTS">Sports Nutrition</option>
+          <option value="CLINICAL">Clinical Nutrition</option>
+          <option value="HOSPITAL">Hospital Nutrition</option>
+          <option value="PEDIATRIC">Pediatric Nutrition</option>
+          <option value="OTHER">Other</option>
+        </select>
+      </div>
+
+      <p class="section-label">Subscription plan</p>
+      <div class="plan-grid">
+
+        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_1'"
+             (click)="formData.typeAbonnement = 'MOIS_1'">
+          <div class="plan-check"></div>
+          <div class="plan-duration">1 Month</div>
+          <div class="plan-price">300 <span>DT</span></div>
+          <div class="plan-save">300 DT / month</div>
+        </div>
+
+        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_3'"
+             (click)="formData.typeAbonnement = 'MOIS_3'">
+          <div class="plan-check"></div>
+          <div class="plan-duration">3 Months</div>
+          <div class="plan-price">750 <span>DT</span></div>
+          <div class="plan-save">250 DT / month</div>
+        </div>
+
+        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'MOIS_6'"
+             (click)="formData.typeAbonnement = 'MOIS_6'">
+          <div class="plan-check"></div>
+          <div class="plan-duration">6 Months</div>
+          <div class="plan-price">1320 <span>DT</span></div>
+          <div class="plan-save">220 DT / month</div>
+        </div>
+
+        <div class="plan-card" [class.selected]="formData.typeAbonnement === 'AN_1'"
+             (click)="formData.typeAbonnement = 'AN_1'">
+          <div class="plan-check"></div>
+          <div class="plan-duration">1 Year ⭐</div>
+          <div class="plan-price">2160 <span>DT</span></div>
+          <div class="plan-save">180 DT / month</div>
+        </div>
+
+      </div>
+
+      <p class="section-label">Security</p>
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label>Password</label>
+          <input type="password" [(ngModel)]="formData.pwd" name="pwd" placeholder="••••••••" required>
+        </div>
+        <div class="col-md-6">
+          <label>Confirm password</label>
+          <input type="password" [(ngModel)]="confirmPwd" name="confirmPwd" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" [(ngModel)]="agreed" name="agreed" id="terms-n">
+        <label for="terms-n">
+          I agree to the <span class="link">Terms and Conditions</span> and <span class="link">Privacy Policy</span>
+        </label>
+      </div>
+
+      <!-- ✅ type="button" pour éviter le submit du formulaire -->
+      <button type="button" [disabled]="!agreed" (click)="register()">Subscribe now 🎉</button>
+
+    </form>
+
+    <p class="login-link">
+      Already have an account?
+      <span class="link" [routerLink]="['/authentification','nutritionist']">Log in</span>
+    </p>
+
   </div>
-
-
-     <!-- ---------------------------------- -->
-
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-    <div>
-        <label>Password</label>
-        <input type="password" placeholder="••••••••">
-    </div>
-    <div>
-        <label>Confirm Password</label>
-        <input type="password" placeholder="••••••••">
-    </div>
 </div>
-<input type="checkbox" name="" id="">
-    <label for="">I agree to the <span>
-         Terms and Conditions</span> and <span> Privacy Policy</span></label>
-   
-<button>
-    Subscribe Now🎉
-</button>
-
-</form>
-<span>
-    Already have an account? <span [routerLink]="['/authentification','nutritionist']">Log in</span>
-</span></div>

@@ -1,90 +1,107 @@
+<div class="page">
+  <div class="card">
 
-<div>
-    <div>
-        
+    <div class="logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="white" width="20" height="20">
+          <path d="M12 2a10 10 0 1 0 0 20A10 10 0 0 0 12 2zm1 14h-2v-5h2v5zm0-7h-2V7h2v2z"/>
+        </svg>
+      </div>
+      <span class="logo-text">HealthFlow</span>
     </div>
-<h1>
-    Join HealthFlow
-</h1>
-<span>Subscribe as a Bloomer🌸</span>
 
-<form action="">
-    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-    <div>
-        <label>First Name</label>
-        <input type="text" placeholder="name">
-    </div>
-    <div>
-        <label>Last Name</label>
-        <input type="text" placeholder="Family name">
-    </div>
+    <h1>Join HealthFlow</h1>
+    <p class="subtitle">Subscribe as a Bloomer 🌸</p>
+
+    <form (ngSubmit)="register()">
+
+      <p class="section-label">Personal info</p>
+      <div class="grid-2">
+        <div class="field">
+          <label>First name</label>
+          <input type="text" [(ngModel)]="formData.prenom" name="prenom" placeholder="First name" required>
+        </div>
+        <div class="field">
+          <label>Last name</label>
+          <input type="text" [(ngModel)]="formData.nom" name="nom" placeholder="Last name" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Email address</label>
+        <input type="email" [(ngModel)]="formData.email" name="email" placeholder="bloomer@example.com" required>
+      </div>
+
+      <p class="section-label">Body & goals</p>
+      <div class="grid-2">
+        <div class="field">
+          <label>Age</label>
+          <input type="number" [(ngModel)]="formData.age" name="age" placeholder="25">
+        </div>
+        <div class="field">
+          <label>Height (cm)</label>
+          <input type="number" [(ngModel)]="formData.height" name="height" placeholder="170">
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="field">
+          <label>Weight (kg)</label>
+          <input type="number" [(ngModel)]="formData.weight" name="weight" placeholder="65">
+        </div>
+        <div class="field">
+          <label>Your goal</label>
+          <select [(ngModel)]="formData.goal" name="goal">
+            <option value="">Select your goal</option>
+            <option value="WEIGHT_LOSS">Weight Loss</option>
+            <option value="MUSCLE_GAIN">Muscle Gain</option>
+            <option value="MAINTAIN">Maintain Weight</option>
+            <option value="FITNESS">Improve Fitness</option>
+            <option value="HEALTHY_EATING">Healthy Eating Habits</option>
+            <option value="ENERGY">Increase Energy</option>
+            <option value="OTHER">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Lifestyle level</label>
+        <select [(ngModel)]="formData.lifestyleLevel" name="lifestyleLevel">
+          <option value="">Select your level</option>
+          <option value="DEBUTANT">Débutant</option>
+          <option value="INTERMEDIAIRE">Intermédiaire</option>
+          <option value="DISCIPLINE">Discipliné</option>
+          <option value="AVANCE">Avancé</option>
+          <option value="EXPERT">Expert</option>
+        </select>
+      </div>
+
+      <p class="section-label">Security</p>
+      <div class="grid-2">
+        <div class="field">
+          <label>Password</label>
+          <input type="password" [(ngModel)]="formData.pwd" name="pwd" placeholder="••••••••" required>
+        </div>
+        <div class="field">
+          <label>Confirm password</label>
+          <input type="password" [(ngModel)]="confirmPwd" name="confirmPwd" placeholder="••••••••">
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" [(ngModel)]="agreed" name="agreed" id="terms-b">
+        <label for="terms-b">
+          I agree to the <span class="link">Terms and Conditions</span> and <span class="link">Privacy Policy</span>
+        </label>
+      </div>
+
+      <button type="submit" class="btn-submit" [disabled]="!agreed">Subscribe now 🎉</button>
+    </form>
+
+    <p class="login-link">
+      Already have an account?
+      <span class="link" [routerLink]="['/authentification','bloomer']">Log in</span>
+    </p>
+
+  </div>
 </div>
-
-    <label for="">Email Address</label>
-    <input type="email" placeholder="bloomer@exemple.com">
-
- <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem;">
-    <div>
-         <label for="">Age</label>
-    <input type="number" placeholder="age">
-    </div>
-   
-<div>
- <label for="">Height (cm)</label>
-    <input type="number" placeholder="height">
-</div>
-
-   <div>
- <label for="">weight (kg)</label>
-    <input type="number" placeholder="weight">
-   </div>
-
-
- </div>
-    <label for="">Your Goal</label>
-    <select name="" id="">
-        <option value="">Select your goal</option>
-        <option value="">Weight Loss</option>
-        <option value="">Muscle Gain</option>
-        <option value="">Maintain Weight </option>
-        <option value="">Improve Fitness</option>
-        <option value="">Healthy Eating Habits</option>
-        <option value="">Increase Energy</option>
-        <option value="">Other</option>
-
-    </select>
-   <label for="">Relation avec Lifestyle Healthy</label>
-    <select name="" id="">
-        <option value="">Select your level</option>
-        <option value="">Débutant</option>
-        <option value="">Intermédiaire</option>
-        <option value="">Discipliné </option>
-        <option value="">Avancé</option>
-        <option value="">Expert</option>
-
-    </select>
-
-
-
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
-    <div>
-        <label>Password</label>
-        <input type="password" placeholder="••••••••">
-    </div>
-    <div>
-        <label>Confirm Password</label>
-        <input type="password" placeholder="••••••••">
-    </div>
-</div>
-<input type="checkbox" name="" id="">
-    <label for="">I agree to the <span>
-         Terms and Conditions</span> and <span> Privacy Policy</span></label>
-   
-<button>
-    Subscribe Now🎉
-</button>
-
-</form>
-<span>
-    Already have an account? <span [routerLink]="['/authentification','bloomer']">Log in</span>
-</span></div>
