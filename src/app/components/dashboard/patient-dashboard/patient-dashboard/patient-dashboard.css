@@ -315,3 +315,58 @@
 .confirm-msg  { font-size: 14px; color: #374151; line-height: 1.6; }
 .confirm-hint { font-size: 12px; color: #9ca3af; }
 .confirm-btns { display: flex; gap: 10px; margin-top: 8px; }
+/* ── Nutritionniste Grid ── */
+.nutri-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.nutri-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  background: var(--card-bg, #fff);
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 12px;
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: box-shadow .2s;
+}
+.nutri-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+
+.nutri-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  color: #fff;
+  font-size: 18px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+
+.nutri-info { flex: 1; }
+.nutri-name { font-weight: 600; font-size: 15px; margin: 0 0 4px; }
+.nutri-spec { font-size: 13px; color: #6b7280; margin: 0 0 2px; }
+.nutri-loc  { font-size: 12px; color: #9ca3af; margin: 0; }
+
+.btn-primary.small { padding: 8px 16px; font-size: 13px; }
+
+/* ── Selected bar ── */
+.nutri-selected-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  font-size: 15px;
+}
+.btn-back {
+  background: none;
+  border: 1px solid var(--border, #e5e7eb);
+  border-radius: 8px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-size: 13px;
+}

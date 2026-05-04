@@ -12,7 +12,9 @@ export class RendezVousService {
   getAll(): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(this.api);
   }
-
+getAllNutritionnistes(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.api}/nutritionnistes`);
+}
   // ✅ String UUID
   getByNutritionniste(id: string): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(`${this.api}/nutritionniste/${id}`);
@@ -43,4 +45,7 @@ export class RendezVousService {
   terminer(id: number): Observable<RendezVous> {
     return this.http.patch<RendezVous>(`${this.api}/${id}/terminer`, {});
   }
+  create(rdv: any): Observable<RendezVous> {
+  return this.http.post<RendezVous>(this.api, rdv);
+}
 }
