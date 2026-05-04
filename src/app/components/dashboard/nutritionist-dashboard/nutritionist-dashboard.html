@@ -43,608 +43,769 @@
   <!-- ═══ MAIN CONTENT ═══ -->
   <div class="main-content">
 
-    <!-- ═══ HEADER ═══ -->
-    <div class="dashboard-header">
-      <div class="header-left">
-        <div class="brand-mark">🥗</div>
-        <div>
-          <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
-          <p class="welcome-text">Bienvenue ! Mardi 6 mai 2025</p>
-        </div>
+    <!-- ═══ PAGE CONVERSATIONS ═══ -->
+    @if (activePage === 'conv') {
+      <div style="height:100%;display:flex;flex-direction:column;">
+        <app-conversation [initialPatientId]="selectedPatientId"></app-conversation>
       </div>
-      <div class="header-right">
-        <div class="notif-btn">
-          🔔
-          <span class="notif-dot"></span>
-        </div>
-        <button class="btn-new-client">+ Nouveau client</button>
-        <div class="avatar-icon">NK</div>
-      </div>
-    </div>
+    }
 
-    <!-- ═══ STATS ═══ -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <div class="stat-icon si-sage">👥</div>
-        <div class="stat-info">
-          <div class="stat-value v-sage">{{ consultations.length }}</div>
-          <p class="stat-label">Total clients</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon si-plum">📅</div>
-        <div class="stat-info">
-          <div class="stat-value v-plum">{{ rendezVousConfirmes.length }}</div>
-          <p class="stat-label">RDV confirmés</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon si-amber">⏳</div>
-        <div class="stat-info">
-          <div class="stat-value v-amber">{{ rendezVousEnAttente.length }}</div>
-          <p class="stat-label">En attente</p>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon si-rose">✗</div>
-        <div class="stat-info">
-          <div class="stat-value v-rose">{{ rendezVousRefuses.length }}</div>
-          <p class="stat-label">Refusés</p>
-        </div>
-      </div>
-    </div>
+    <!-- ═══ PAGE PARAMÈTRES ═══ -->
+    @if (activePage === 'params') {
+      <div class="params-wrapper">
 
-    <!-- ═══ MAIN GRID ═══ -->
-    <div class="main-grid">
-
-      <!-- ── LEFT COLUMN ── -->
-      <div class="left-column">
-
-        <!-- TODAY'S APPOINTMENTS -->
-        <div class="card">
-          <div class="card-header">
-            <h2>Rendez-vous du jour</h2>
-            <a class="view-all">Voir tout</a>
-          </div>
-
-          <div class="tabs">
-            <button type="button" [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
-              En attente ({{ rendezVousEnAttente.length }})
-            </button>
-            <button type="button" [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
-              Confirmés ({{ rendezVousConfirmes.length }})
-            </button>
-            <button type="button" [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
-              Refusés ({{ rendezVousRefuses.length }})
-            </button>
-          </div>
-
-          @if (activeTab === 'attente') {
-          @for (rdv of rendezVousEnAttente; track rdv.id) {
-          <div class="rdv-item">
-            <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
-            <div class="rdv-info">
-              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-              <p class="rdv-type">{{ rdv.motif }}</p>
+        <!-- Header -->
+        <div class="params-header">
+          <div class="params-header-left">
+            <div class="params-avatar">NK</div>
+            <div>
+              <h2 class="params-title">Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</h2>
+              <p class="params-subtitle">{{ profileForm.specialite }}</p>
             </div>
-            <div class="rdv-actions">
-              <button type="button" class="btn-accept" (click)="accepter(rdv.id)">✓ Accepter</button>
-              <button type="button" class="btn-refuse" (click)="refuser(rdv.id)">✗ Refuser</button>
-            </div>
-            <div class="phone-btn">📞</div>
           </div>
-          }
-          @if (rendezVousEnAttente.length === 0) {
-          <p class="empty-state">Aucun rendez-vous en attente</p>
-          }
-          }
-
-          @if (activeTab === 'confirme') {
-          @for (rdv of rendezVousConfirmes; track rdv.id) {
-          <div class="rdv-item">
-            <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
-            <div class="rdv-info">
-              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-              <p class="rdv-type">{{ rdv.motif }}</p>
-            </div>
-            <span class="badge-status confirmed">confirmé</span>
-            <div class="phone-btn pink">📞</div>
-          </div>
-          }
-          @if (rendezVousConfirmes.length === 0) {
-          <p class="empty-state">Aucun rendez-vous confirmé</p>
-          }
-          }
-
-          @if (activeTab === 'refuse') {
-          @for (rdv of rendezVousRefuses; track rdv.id) {
-          <div class="rdv-item">
-            <div class="rdv-time-bubble grey">{{ rdv.dateHeure | date:'HH' }}h</div>
-            <div class="rdv-info">
-              <p class="rdv-name">Patient #{{ rdv.userId }}</p>
-              <p class="rdv-type">{{ rdv.motif }}</p>
-            </div>
-            <span class="badge-status refused">refusé</span>
-            <div class="phone-btn grey">📞</div>
-          </div>
-          }
-          @if (rendezVousRefuses.length === 0) {
-          <p class="empty-state">Aucun rendez-vous refusé</p>
-          }
-          }
+          <button class="btn-logout" (click)="logout()">
+            <span>🚪</span> Se déconnecter
+          </button>
         </div>
 
-        <!-- RECENT CLIENTS -->
-        <div class="card">
-          <div class="card-header">
-            <h2>Clients récents</h2>
-            <a class="view-all">Voir tout</a>
+        <!-- Alerts -->
+        @if (paramSuccess) {
+          <div class="alert-success" style="margin-bottom:16px">✓ {{ paramSuccess }}</div>
+        }
+        @if (paramError) {
+          <div class="alert-error" style="margin-bottom:16px">⚠ {{ paramError }}</div>
+        }
+
+        <div class="params-layout">
+
+          <!-- Tabs sidebar -->
+          <div class="params-tabs-sidebar">
+            <div class="params-tab-item" [class.active]="activeParamsTab==='compte'" (click)="setParamsTab('compte')">
+              <span>👤</span> Mon compte
+            </div>
+            <div class="params-tab-item" [class.active]="activeParamsTab==='securite'" (click)="setParamsTab('securite')">
+              <span>🔒</span> Sécurité
+            </div>
+            <div class="params-tab-item" [class.active]="activeParamsTab==='notifs'" (click)="setParamsTab('notifs')">
+              <span>🔔</span> Notifications
+            </div>
+            <div class="params-tab-item" [class.active]="activeParamsTab==='prefs'" (click)="setParamsTab('prefs')">
+              <span>🎨</span> Préférences
+            </div>
+            <div class="params-tab-item params-tab-danger" (click)="logout()">
+              <span>🚪</span> Déconnexion
+            </div>
           </div>
 
-          @for (c of consultations; track c.id) {
-          <div class="client-item" (click)="openConsultation(c.id)">
-            <div class="client-row">
-              <div class="client-avatar">{{ getInitials(c.userId) }}</div>
-              <div class="client-meta">
-                <p class="client-name">Patient #{{ c.userId }}</p>
-                <p class="client-goal">{{ c.objectif }}</p>
+          <!-- Tab content -->
+          <div class="params-content">
+
+            <!-- ── COMPTE ── -->
+            @if (activeParamsTab === 'compte') {
+              <div class="params-section">
+                <h3 class="params-section-title">Informations personnelles</h3>
+                <p class="params-section-desc">Modifiez vos informations de profil visibles par vos patients.</p>
+                <div class="params-avatar-block">
+                  <div class="params-avatar-big">NK</div>
+                  <div>
+                    <p class="params-avatar-name">Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</p>
+                    <p class="params-avatar-role">{{ profileForm.specialite }}</p>
+                    <button class="btn-change-photo">📷 Changer la photo</button>
+                  </div>
+                </div>
+                <div class="params-form-grid">
+                  <div class="form-group">
+                    <label>Prénom</label>
+                    <input type="text" [(ngModel)]="profileForm.prenom" placeholder="Prénom">
+                  </div>
+                  <div class="form-group">
+                    <label>Nom</label>
+                    <input type="text" [(ngModel)]="profileForm.nom" placeholder="Nom">
+                  </div>
+                  <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" [(ngModel)]="profileForm.email" placeholder="email@exemple.com">
+                  </div>
+                  <div class="form-group">
+                    <label>Téléphone</label>
+                    <input type="tel" [(ngModel)]="profileForm.telephone" placeholder="+216 XX XXX XXX">
+                  </div>
+                  <div class="form-group params-full">
+                    <label>Spécialité</label>
+                    <input type="text" [(ngModel)]="profileForm.specialite" placeholder="Votre spécialité">
+                  </div>
+                  <div class="form-group params-full">
+                    <label>Bio / Présentation</label>
+                    <textarea [(ngModel)]="profileForm.bio" rows="3" placeholder="Décrivez votre parcours..."></textarea>
+                  </div>
+                </div>
+                <div class="params-actions">
+                  <button class="btn-save-params" (click)="saveProfile()">💾 Enregistrer le profil</button>
+                </div>
               </div>
-              <span class="goal-tag">IMC {{ c.imc | number:'1.1-1' }}</span>
-            </div>
-            <div class="progress-bar">
-              <div class="progress-fill" [style.width]="'60%'"></div>
-            </div>
-            <div class="progress-meta">
-              <span>Progression</span>
-              <span>60%</span>
-            </div>
-            <p class="last-visit">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</p>
-          </div>
-          }
-          @if (consultations.length === 0) {
-          <p class="empty-state">Aucune consultation</p>
-          }
-        </div>
+            }
 
-        <!-- QUICK ACTIONS -->
-        <div class="quick-actions-grid">
-          <div class="action-card">
-            <div class="action-icon si-sage">📊</div>
-            <div class="action-body">
-              <h3>Plan alimentaire</h3>
-              <p>Créer un plan personnalisé</p>
-            </div>
-          </div>
-          <div class="action-card">
-            <div class="action-icon si-plum">📝</div>
-            <div class="action-body">
-              <h3>Rapports clients</h3>
-              <p>Analyses et progression</p>
-            </div>
-          </div>
-          <div class="action-card">
-            <div class="action-icon si-amber">📚</div>
-            <div class="action-body">
-              <h3>Ressources</h3>
-              <p>Guides et recettes</p>
-            </div>
+            <!-- ── SECURITE ── -->
+            @if (activeParamsTab === 'securite') {
+              <div class="params-section">
+                <h3 class="params-section-title">Changer le mot de passe</h3>
+                <p class="params-section-desc">Utilisez un mot de passe fort d'au moins 8 caractères.</p>
+                <div class="params-form-col">
+                  <div class="form-group">
+                    <label>Mot de passe actuel</label>
+                    <input type="password" [(ngModel)]="passwordForm.ancien" placeholder="••••••••">
+                  </div>
+                  <div class="form-group">
+                    <label>Nouveau mot de passe</label>
+                    <input type="password" [(ngModel)]="passwordForm.nouveau" placeholder="••••••••">
+                  </div>
+                  <div class="form-group">
+                    <label>Confirmer le nouveau mot de passe</label>
+                    <input type="password" [(ngModel)]="passwordForm.confirmer" placeholder="••••••••">
+                  </div>
+                </div>
+                <div class="params-password-tips">
+                  <p class="params-tip">✓ Au moins 8 caractères</p>
+                  <p class="params-tip">✓ Une lettre majuscule</p>
+                  <p class="params-tip">✓ Un chiffre ou caractère spécial</p>
+                </div>
+                <div class="params-actions">
+                  <button class="btn-save-params" (click)="savePassword()">🔒 Modifier le mot de passe</button>
+                </div>
+                <div class="params-danger-zone">
+                  <h4>Zone de danger</h4>
+                  <p>Supprimer définitivement votre compte et toutes vos données.</p>
+                  <button class="btn-danger">🗑 Supprimer mon compte</button>
+                </div>
+              </div>
+            }
+
+            <!-- ── NOTIFICATIONS ── -->
+            @if (activeParamsTab === 'notifs') {
+              <div class="params-section">
+                <h3 class="params-section-title">Préférences de notifications</h3>
+                <p class="params-section-desc">Choisissez comment et quand vous souhaitez être notifié.</p>
+                <div class="params-notif-group">
+                  <p class="params-notif-category">📧 Notifications par email</p>
+                  <div class="params-toggle-row">
+                    <div class="params-toggle-info">
+                      <span class="params-toggle-label">Nouveaux rendez-vous</span>
+                      <span class="params-toggle-desc">Recevoir un email lors d'une nouvelle demande de RDV</span>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="notifPrefs.emailRdv">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="params-toggle-row">
+                    <div class="params-toggle-info">
+                      <span class="params-toggle-label">Nouveaux messages</span>
+                      <span class="params-toggle-desc">Recevoir un email pour chaque nouveau message patient</span>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="notifPrefs.emailMessage">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="params-toggle-row">
+                    <div class="params-toggle-info">
+                      <span class="params-toggle-label">Rapports hebdomadaires</span>
+                      <span class="params-toggle-desc">Recevoir un récapitulatif chaque semaine</span>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="notifPrefs.emailRapport">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="params-notif-group">
+                  <p class="params-notif-category">📱 Notifications SMS</p>
+                  <div class="params-toggle-row">
+                    <div class="params-toggle-info">
+                      <span class="params-toggle-label">Rappels de rendez-vous</span>
+                      <span class="params-toggle-desc">SMS de rappel 1h avant chaque RDV</span>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="notifPrefs.smsRdv">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                  <div class="params-toggle-row">
+                    <div class="params-toggle-info">
+                      <span class="params-toggle-label">Messages urgents</span>
+                      <span class="params-toggle-desc">SMS pour les messages marqués urgents</span>
+                    </div>
+                    <label class="toggle-switch">
+                      <input type="checkbox" [(ngModel)]="notifPrefs.smsMessage">
+                      <span class="toggle-slider"></span>
+                    </label>
+                  </div>
+                </div>
+                <div class="params-actions">
+                  <button class="btn-save-params" (click)="saveNotifs()">🔔 Enregistrer les notifications</button>
+                </div>
+              </div>
+            }
+
+            <!-- ── PRÉFÉRENCES ── -->
+            @if (activeParamsTab === 'prefs') {
+              <div class="params-section">
+                <h3 class="params-section-title">Préférences d'affichage</h3>
+                <p class="params-section-desc">Personnalisez l'interface selon vos préférences.</p>
+                <div class="pref-block">
+                  <div class="pref-block-header">
+                    <span class="pref-block-icon">🌐</span>
+                    <div>
+                      <span class="pref-block-label">Langue de l'interface</span>
+                      <span class="pref-block-hint">Sélectionnée : <strong>{{ previewLangue === 'fr' ? '🇫🇷 Français' : previewLangue === 'en' ? '🇬🇧 English' : '🇹🇳 العربية' }}</strong></span>
+                    </div>
+                  </div>
+                  <div class="pref-langue-grid">
+                    <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'fr'" (click)="onLangueChange('fr')">
+                      <span class="pref-flag">🇫🇷</span>
+                      <span class="pref-lang-name">Français</span>
+                      @if (previewLangue === 'fr') { <span class="pref-check">✓</span> }
+                    </button>
+                    <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'en'" (click)="onLangueChange('en')">
+                      <span class="pref-flag">🇬🇧</span>
+                      <span class="pref-lang-name">English</span>
+                      @if (previewLangue === 'en') { <span class="pref-check">✓</span> }
+                    </button>
+                    <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'ar'" (click)="onLangueChange('ar')">
+                      <span class="pref-flag">🇹🇳</span>
+                      <span class="pref-lang-name">العربية</span>
+                      @if (previewLangue === 'ar') { <span class="pref-check">✓</span> }
+                    </button>
+                  </div>
+                </div>
+                <div class="pref-block">
+                  <div class="pref-block-header">
+                    <span class="pref-block-icon">🎨</span>
+                    <div>
+                      <span class="pref-block-label">Thème de l'interface</span>
+                      <span class="pref-block-hint">Actif : <strong>{{ previewTheme === 'light' ? '☀️ Clair' : previewTheme === 'dark' ? '🌙 Sombre' : '🖥️ Automatique' }}</strong></span>
+                    </div>
+                  </div>
+                  <div class="pref-theme-grid">
+                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'light'" (click)="onThemeChange('light')">
+                      <div class="theme-preview theme-preview-light">
+                        <div class="tp-sidebar"></div>
+                        <div class="tp-body">
+                          <div class="tp-card"></div>
+                          <div class="tp-card tp-card-sm"></div>
+                        </div>
+                      </div>
+                      <div class="pref-theme-label">
+                        <span>☀️ Clair</span>
+                        @if (previewTheme === 'light') { <span class="pref-check">✓</span> }
+                      </div>
+                    </button>
+                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'dark'" (click)="onThemeChange('dark')">
+                      <div class="theme-preview theme-preview-dark">
+                        <div class="tp-sidebar"></div>
+                        <div class="tp-body">
+                          <div class="tp-card"></div>
+                          <div class="tp-card tp-card-sm"></div>
+                        </div>
+                      </div>
+                      <div class="pref-theme-label">
+                        <span>🌙 Sombre</span>
+                        @if (previewTheme === 'dark') { <span class="pref-check">✓</span> }
+                      </div>
+                    </button>
+                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'auto'" (click)="onThemeChange('auto')">
+                      <div class="theme-preview theme-preview-auto">
+                        <div class="tp-half-light">
+                          <div class="tp-sidebar"></div>
+                          <div class="tp-body"><div class="tp-card"></div></div>
+                        </div>
+                        <div class="tp-half-dark">
+                          <div class="tp-sidebar"></div>
+                          <div class="tp-body"><div class="tp-card"></div></div>
+                        </div>
+                      </div>
+                      <div class="pref-theme-label">
+                        <span>🖥️ Automatique</span>
+                        @if (previewTheme === 'auto') { <span class="pref-check">✓</span> }
+                      </div>
+                    </button>
+                  </div>
+                </div>
+                <div class="params-actions">
+                  <button class="btn-save-params" (click)="savePrefs()">🎨 Enregistrer les préférences</button>
+                </div>
+              </div>
+            }
+
+          </div><!-- /params-content -->
+        </div><!-- /params-layout -->
+      </div><!-- /params-wrapper -->
+    }
+
+    <!-- ═══ PAGE DASHBOARD ═══ -->
+    @if (activePage === 'dashboard') {
+
+      <div class="dashboard-header">
+        <div class="header-left">
+          <div class="brand-mark">🥗</div>
+          <div>
+            <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
+            <p class="welcome-text">Bienvenue ! Mardi 6 mai 2025</p>
           </div>
         </div>
-
+        <div class="header-right">
+          <div class="notif-btn">🔔<span class="notif-dot"></span></div>
+          <button class="btn-new-client">+ Nouveau client</button>
+          <div class="avatar-icon">NK</div>
+        </div>
       </div>
 
-      <!-- ── RIGHT SIDEBAR ── -->
-      <div class="sidebar">
-
-        <!-- UPCOMING WEEK -->
-        <div class="card">
-          <div class="card-header">
-            <h2>Cette semaine</h2>
-            <a class="view-all">Agenda</a>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon si-sage">👥</div>
+          <div class="stat-info">
+            <div class="stat-value v-sage">{{ rendezVousConfirmes.length }}</div>
+            <p class="stat-label">Total clients</p>
           </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-plum">📅</div>
+          <div class="stat-info">
+            <div class="stat-value v-plum">{{ rendezVousConfirmes.length }}</div>
+            <p class="stat-label">RDV confirmés</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-amber">⏳</div>
+          <div class="stat-info">
+            <div class="stat-value v-amber">{{ rendezVousEnAttente.length }}</div>
+            <p class="stat-label">En attente</p>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon si-rose">✗</div>
+          <div class="stat-info">
+            <div class="stat-value v-rose">{{ rendezVousRefuses.length }}</div>
+            <p class="stat-label">Refusés</p>
+          </div>
+        </div>
+      </div>
 
-          @for (rdv of upcomingRdv; track rdv.id) {
-          <div class="upcoming-item">
-            <div class="up-dot" [class]="rdv.dotColor"></div>
-            <div class="up-info">
-              <div class="up-name">Patient #{{ rdv.userId }}</div>
-              <div class="up-time">{{ rdv.dateHeure | date:'EEE · HH:mm' }}</div>
+      <div class="main-grid">
+        <div class="left-column">
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Rendez-vous du jour</h2>
+              <a class="view-all">Voir tout</a>
             </div>
-            <span class="up-type" [class]="rdv.badgeColor">{{ rdv.motif }}</span>
+            <div class="tabs">
+              <button type="button" [class.active]="activeTab === 'attente'" (click)="setTab('attente')">
+                En attente ({{ rendezVousEnAttente.length }})
+              </button>
+              <button type="button" [class.active]="activeTab === 'confirme'" (click)="setTab('confirme')">
+                Confirmés ({{ rendezVousConfirmes.length }})
+              </button>
+              <button type="button" [class.active]="activeTab === 'refuse'" (click)="setTab('refuse')">
+                Refusés ({{ rendezVousRefuses.length }})
+              </button>
+            </div>
+
+            @if (activeTab === 'attente') {
+              @for (rdv of rendezVousEnAttente; track rdv.id) {
+                <div class="rdv-item">
+                  <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
+                  <div class="rdv-info">
+                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-type">{{ rdv.motif }}</p>
+                  </div>
+                  <div class="rdv-actions">
+                    <button type="button" class="btn-accept" (click)="accepter(rdv.id)">✓ Accepter</button>
+                    <button type="button" class="btn-refuse" (click)="refuser(rdv.id)">✗ Refuser</button>
+                  </div>
+                  <div class="phone-btn">📞</div>
+                </div>
+              }
+              @if (rendezVousEnAttente.length === 0) {
+                <p class="empty-state">Aucun rendez-vous en attente</p>
+              }
+            }
+
+            @if (activeTab === 'confirme') {
+              @for (rdv of rendezVousConfirmes; track rdv.id) {
+                <div class="rdv-item">
+                  <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
+                  <div class="rdv-info">
+                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-type">{{ rdv.motif }}</p>
+                  </div>
+                  <span class="badge-status confirmed">confirmé</span>
+                  <div class="phone-btn pink">📞</div>
+                </div>
+              }
+              @if (rendezVousConfirmes.length === 0) {
+                <p class="empty-state">Aucun rendez-vous confirmé</p>
+              }
+            }
+
+            @if (activeTab === 'refuse') {
+              @for (rdv of rendezVousRefuses; track rdv.id) {
+                <div class="rdv-item">
+                  <div class="rdv-time-bubble grey">{{ rdv.dateHeure | date:'HH' }}h</div>
+                  <div class="rdv-info">
+                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-type">{{ rdv.motif }}</p>
+                  </div>
+                  <span class="badge-status refused">refusé</span>
+                  <div class="phone-btn grey">📞</div>
+                </div>
+              }
+              @if (rendezVousRefuses.length === 0) {
+                <p class="empty-state">Aucun rendez-vous refusé</p>
+              }
+            }
           </div>
-          }
-          @if (upcomingRdv.length === 0) {
-          <p class="empty-state">Aucun RDV cette semaine</p>
-          }
+
+          <div class="card">
+            <div class="card-header">
+              <h2>Clients récents</h2>
+              <a class="view-all">Voir tout</a>
+            </div>
+            @for (c of consultations; track c.id) {
+              <div class="client-item" (click)="openConsultation(c.id)">
+                <div class="client-row">
+                  <div class="client-avatar">{{ getInitials(c.userId) }}</div>
+                  <div class="client-meta">
+                    <p class="client-name">Patient #{{ c.userId }}</p>
+                    <p class="client-goal">{{ c.objectif }}</p>
+                  </div>
+                  <span class="goal-tag">IMC {{ c.imc | number:'1.1-1' }}</span>
+                </div>
+                <div class="progress-bar">
+                  <div class="progress-fill" [style.width]="'60%'"></div>
+                </div>
+                <div class="progress-meta">
+                  <span>Progression</span><span>60%</span>
+                </div>
+                <p class="last-visit">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</p>
+              </div>
+            }
+            @if (consultations.length === 0) {
+              <p class="empty-state">Aucune consultation</p>
+            }
+          </div>
+
+          <div class="quick-actions-grid">
+            <div class="action-card">
+              <div class="action-icon si-sage">📊</div>
+              <div class="action-body"><h3>Plan alimentaire</h3><p>Créer un plan personnalisé</p></div>
+            </div>
+            <div class="action-card">
+              <div class="action-icon si-plum">📝</div>
+              <div class="action-body"><h3>Rapports clients</h3><p>Analyses et progression</p></div>
+            </div>
+            <div class="action-card">
+              <div class="action-icon si-amber">📚</div>
+              <div class="action-body"><h3>Ressources</h3><p>Guides et recettes</p></div>
+            </div>
+          </div>
+
         </div>
 
-      </div>
-    </div>
-
-    <!-- ═══ CONSULTATIONS PATIENTS ═══ -->
-    <div class="card full-width">
-      <div class="card-header">
-        <h2>Consultations Patients</h2>
-      </div>
-
-      @for (c of consultations; track c.id) {
-      <div class="consultation-row">
-        <div class="patient-avatar-sm">{{ getInitials(c.userId) }}</div>
-        <div class="consultation-info">
-          <span class="patient-id">Patient #{{ c.userId }}</span>
-          <span class="consultation-date">{{ c.dateConsultation | date:'dd/MM/yyyy' }}</span>
-          <span class="objectif-tag">{{ c.objectif }}</span>
-        </div>
-        <span class="imc-pill" [class]="imcClass(c.imc)">IMC: {{ c.imc | number:'1.1-1' }}</span>
-        <div class="row-actions">
-          <button type="button" class="btn-sm btn-voir" (click)="openConsultation(c.id)">
-            👁 Voir & Plan
-          </button>
-          <button type="button" class="btn-sm btn-conv" (click)="openConversation(c.userId)">
-            💬 Conversation
-          </button>
-          <button type="button" class="btn-sm btn-rapport" (click)="openRapport(c.id)">
-            📝 Rapport
-          </button>
+        <div class="sidebar">
+          <div class="card">
+            <div class="card-header">
+              <h2>Cette semaine</h2>
+              <a class="view-all">Agenda</a>
+            </div>
+            @for (rdv of upcomingRdv; track rdv.id) {
+              <div class="upcoming-item">
+                <div class="up-dot" [class]="rdv.dotColor"></div>
+                <div class="up-info">
+                  <div class="up-name">Patient #{{ rdv.userId }}</div>
+                  <div class="up-time">{{ rdv.dateHeure | date:'EEE · HH:mm' }}</div>
+                </div>
+                <span class="up-type" [class]="rdv.badgeColor">{{ rdv.motif }}</span>
+              </div>
+            }
+            @if (upcomingRdv.length === 0) {
+              <p class="empty-state">Aucun RDV cette semaine</p>
+            }
+          </div>
         </div>
       </div>
-      }
-      @if (consultations.length === 0) {
-      <p class="empty-state">Aucune consultation</p>
-      }
-    </div>
+
+      <!-- ═══════════════════════════════════════════════════════════
+           CONSULTATIONS PATIENTS
+           ✅ Affiche une ligne par RDV CONFIRMÉ
+           ✅ Bouton "Voir & Plan" TOUJOURS visible
+           ✅ Si consultation existante → IMC + bouton Rapport aussi
+           ✅ Sinon → badge "En attente" + formulaire plan direct
+      ════════════════════════════════════════════════════════════ -->
+      <div class="card full-width">
+        <div class="card-header"><h2>Consultations Patients</h2></div>
+
+        @for (rdv of rendezVousConfirmes; track rdv.id) {
+          <div class="consultation-row">
+            <div class="patient-avatar-sm">{{ getInitials(rdv.userId) }}</div>
+            <div class="consultation-info">
+              <span class="patient-id">Patient #{{ rdv.userId }}</span>
+              <span class="consultation-date">{{ rdv.dateHeure | date:'dd/MM/yyyy' }}</span>
+              <span class="objectif-tag">{{ rdv.motif }}</span>
+            </div>
+
+            <!-- IMC si consultation existante, sinon badge En attente -->
+            @if (getConsultationByUserId(rdv.userId); as consultation) {
+              <span class="imc-pill" [class]="imcClass(consultation.imc)">
+                IMC: {{ consultation.imc | number:'1.1-1' }}
+              </span>
+            } @else {
+              <span class="imc-pill"
+                style="background:#f3f4f6;color:#9ca3af;border:1px dashed #d1d5db;">
+                En attente de consultation
+              </span>
+            }
+
+            <!-- Actions : Voir & Plan TOUJOURS visible -->
+            <div class="row-actions">
+              <button type="button" class="btn-sm btn-voir"
+                (click)="openPlanModal(rdv)">
+                👁 Voir &amp; Plan
+              </button>
+              <button type="button" class="btn-sm btn-conv"
+                (click)="openConversation(rdv.userId)">
+                💬 Conversation
+              </button>
+              @if (getConsultationByUserId(rdv.userId); as consultation) {
+                <button type="button" class="btn-sm btn-rapport"
+                  (click)="openRapport(consultation.id)">
+                  📝 Rapport
+                </button>
+              }
+            </div>
+          </div>
+        }
+
+        @if (rendezVousConfirmes.length === 0) {
+          <p class="empty-state">Aucun rendez-vous confirmé</p>
+        }
+      </div>
+
+    } <!-- fin @if dashboard -->
 
   </div><!-- /main-content -->
 </div><!-- /dashboard-wrapper -->
 
 <!-- ═══ CONSULTATION MODAL ═══ -->
-@if (showModal && selectedConsultation) {
-<div class="modal-overlay" (click)="closeModal()">
-  <div class="modal-content" (click)="$event.stopPropagation()">
-
-    <div class="modal-header">
-      <div class="modal-patient-info">
-        <div class="modal-avatar">{{ getInitials(selectedConsultation.userId) }}</div>
-        <div>
-          <h3>Patient #{{ selectedConsultation.userId }}</h3>
-          <span class="modal-subtitle">{{ selectedConsultation.dateConsultation | date:'dd/MM/yyyy' }}</span>
+@if (showModal) {
+  <div class="modal-overlay" (click)="closeModal()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-patient-info">
+          <div class="modal-avatar">
+            {{ getInitials(selectedConsultation?.userId ?? selectedRdv?.userId) }}
+          </div>
+          <div>
+            <h3>Patient #{{ selectedConsultation?.userId ?? selectedRdv?.userId }}</h3>
+            @if (selectedConsultation) {
+              <span class="modal-subtitle">{{ selectedConsultation.dateConsultation | date:'dd/MM/yyyy' }}</span>
+            } @else {
+              <span class="modal-subtitle">RDV du {{ selectedRdv?.dateHeure | date:'dd/MM/yyyy' }}</span>
+            }
+          </div>
         </div>
-      </div>
-      <button type="button" class="modal-close" (click)="closeModal()">✕</button>
-    </div>
-
-    <div class="modal-tabs">
-      <button type="button" [class.active]="activeModalTab === 'details'" (click)="setModalTab('details')">
-        Détails patient
-      </button>
-      <button type="button" [class.active]="activeModalTab === 'plan'" (click)="setModalTab('plan')">
-        Plan alimentaire
-      </button>
-    </div>
-
-    <!-- TAB DETAILS -->
-    @if (activeModalTab === 'details') {
-    <div class="modal-body">
-      <div class="detail-grid">
-        <div class="detail-card">
-          <span class="detail-label">Poids</span>
-          <strong class="detail-value v-plum">{{ selectedConsultation.poids }} kg</strong>
-        </div>
-        <div class="detail-card">
-          <span class="detail-label">Taille</span>
-          <strong class="detail-value v-plum">{{ selectedConsultation.taille }} m</strong>
-        </div>
-        <div class="detail-card">
-          <span class="detail-label">IMC</span>
-          <strong class="detail-value" [class]="imcClass(selectedConsultation.imc)">
-            {{ selectedConsultation.imc | number:'1.1-1' }}
-          </strong>
-        </div>
-        <div class="detail-card">
-          <span class="detail-label">Objectif</span>
-          <strong class="detail-value">{{ selectedConsultation.objectif }}</strong>
-        </div>
+        <button type="button" class="modal-close" (click)="closeModal()">✕</button>
       </div>
 
-      <div class="detail-section">
-        <div class="detail-row-full">
-          <span class="detail-label">Diagnostic</span>
-          <p class="detail-text">{{ selectedConsultation.diagnostic || '—' }}</p>
-        </div>
-        <div class="detail-row-full">
-          <span class="detail-label">Recommandations</span>
-          <p class="detail-text">{{ selectedConsultation.recommandations || '—' }}</p>
-        </div>
-        <div class="detail-row-full">
-          <span class="detail-label">Notes</span>
-          <p class="detail-text">{{ selectedConsultation.notes || '—' }}</p>
-        </div>
-        @if (selectedConsultation.prochainRdv) {
-        <div class="detail-row-full">
-          <span class="detail-label">Prochain RDV</span>
-          <p class="detail-text">{{ selectedConsultation.prochainRdv | date:'dd/MM/yyyy' }}</p>
-        </div>
+      <!-- Onglets : "Détails patient" masqué si pas de consultation -->
+      <div class="modal-tabs">
+        @if (selectedConsultation) {
+          <button type="button" [class.active]="activeModalTab === 'details'" (click)="setModalTab('details')">
+            Détails patient
+          </button>
         }
-      </div>
-
-      <div class="modal-actions">
-        <button type="button" class="btn-go-plan" (click)="setModalTab('plan')">
-          Créer plan alimentaire →
+        <button type="button" [class.active]="activeModalTab === 'plan'" (click)="setModalTab('plan')">
+          Plan alimentaire
         </button>
       </div>
+
+      @if (activeModalTab === 'details' && selectedConsultation) {
+        <div class="modal-body">
+          <div class="detail-grid">
+            <div class="detail-card">
+              <span class="detail-label">Poids</span>
+              <strong class="detail-value v-plum">{{ selectedConsultation.poids }} kg</strong>
+            </div>
+            <div class="detail-card">
+              <span class="detail-label">Taille</span>
+              <strong class="detail-value v-plum">{{ selectedConsultation.taille }} m</strong>
+            </div>
+            <div class="detail-card">
+              <span class="detail-label">IMC</span>
+              <strong class="detail-value" [class]="imcClass(selectedConsultation.imc)">{{ selectedConsultation.imc | number:'1.1-1' }}</strong>
+            </div>
+            <div class="detail-card">
+              <span class="detail-label">Objectif</span>
+              <strong class="detail-value">{{ selectedConsultation.objectif }}</strong>
+            </div>
+          </div>
+          <div class="detail-section">
+            <div class="detail-row-full">
+              <span class="detail-label">Diagnostic</span>
+              <p class="detail-text">{{ selectedConsultation.diagnostic || '—' }}</p>
+            </div>
+            <div class="detail-row-full">
+              <span class="detail-label">Recommandations</span>
+              <p class="detail-text">{{ selectedConsultation.recommandations || '—' }}</p>
+            </div>
+            <div class="detail-row-full">
+              <span class="detail-label">Notes</span>
+              <p class="detail-text">{{ selectedConsultation.notes || '—' }}</p>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn-go-plan" (click)="setModalTab('plan')">Créer plan alimentaire →</button>
+          </div>
+        </div>
+      }
+
+      @if (activeModalTab === 'plan') {
+        <div class="modal-body">
+          @if (planSuccess) { <div class="alert-success">✓ {{ planSuccess }}</div> }
+          @if (planError)   { <div class="alert-error">⚠ {{ planError }}</div> }
+          <p class="section-label">Informations du plan</p>
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label>Nom du plan *</label>
+              <input type="text" [(ngModel)]="planForm.nom" placeholder="Ex: Plan perte de poids S1">
+            </div>
+            <div class="form-group">
+              <label>Calories journalières (kcal)</label>
+              <input type="number" [(ngModel)]="planForm.caloriesJournalieres" placeholder="Ex: 1800">
+            </div>
+            <div class="form-group">
+              <label>Date début</label>
+              <input type="date" [(ngModel)]="planForm.dateDebut">
+            </div>
+            <div class="form-group">
+              <label>Date fin</label>
+              <input type="date" [(ngModel)]="planForm.dateFin">
+            </div>
+            <div class="form-group form-full">
+              <label>Objectif</label>
+              <select [(ngModel)]="planForm.objectif">
+                @for (opt of objectifOptions; track opt) { <option [value]="opt">{{ opt }}</option> }
+              </select>
+            </div>
+            <div class="form-group form-full">
+              <label>Description</label>
+              <textarea [(ngModel)]="planForm.description" rows="2" placeholder="Contexte et objectifs du plan..."></textarea>
+            </div>
+          </div>
+          <div class="repas-header">
+            <p class="section-label" style="margin:0">Repas du plan</p>
+            <button type="button" class="btn-add-repas" (click)="addRepas()">+ Ajouter repas</button>
+          </div>
+          @for (repas of planForm.repas; track $index; let i = $index) {
+            <div class="repas-card">
+              <div class="repas-card-top">
+                <select [(ngModel)]="repas.typeRepas" class="repas-type-select">
+                  @for (t of repasTypeOptions; track t) { <option [value]="t">{{ t }}</option> }
+                </select>
+                <button type="button" class="btn-remove-repas" (click)="removeRepas(i)">Supprimer</button>
+              </div>
+              <div class="form-grid-2">
+                <div class="form-group">
+                  <label>Nom du repas</label>
+                  <input type="text" [(ngModel)]="repas.nom" placeholder="Ex: Salade niçoise">
+                </div>
+                <div class="form-group">
+                  <label>Aliments</label>
+                  <input type="text" [(ngModel)]="repas.aliments" placeholder="Poulet, riz, légumes...">
+                </div>
+              </div>
+              <div class="form-grid-4">
+                <div class="form-group"><label>Calories</label><input type="number" [(ngModel)]="repas.calories" placeholder="450"></div>
+                <div class="form-group"><label>Protéines (g)</label><input type="number" [(ngModel)]="repas.proteines" placeholder="35"></div>
+                <div class="form-group"><label>Glucides (g)</label><input type="number" [(ngModel)]="repas.glucides" placeholder="40"></div>
+                <div class="form-group"><label>Lipides (g)</label><input type="number" [(ngModel)]="repas.lipides" placeholder="12"></div>
+              </div>
+              <div class="form-group" style="margin-top:8px">
+                <label>Notes</label>
+                <input type="text" [(ngModel)]="repas.notes" placeholder="Sans gluten, sans lactose...">
+              </div>
+            </div>
+          }
+          <div class="modal-actions">
+            <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
+            <button type="button" class="btn-save-plan" (click)="savePlan()" [disabled]="planLoading">
+              @if (planLoading) { Enregistrement... } @else { Enregistrer le plan }
+            </button>
+          </div>
+        </div>
+      }
     </div>
-    }
-
-    <!-- TAB PLAN ALIMENTAIRE -->
-    @if (activeModalTab === 'plan') {
-    <div class="modal-body">
-      @if (planSuccess) {
-      <div class="alert-success">✓ {{ planSuccess }}</div>
-      }
-      @if (planError) {
-      <div class="alert-error">⚠ {{ planError }}</div>
-      }
-
-      <p class="section-label">Informations du plan</p>
-      <div class="form-grid-2">
-        <div class="form-group">
-          <label>Nom du plan *</label>
-          <input type="text" [(ngModel)]="planForm.nom" placeholder="Ex: Plan perte de poids S1">
-        </div>
-        <div class="form-group">
-          <label>Calories journalières (kcal)</label>
-          <input type="number" [(ngModel)]="planForm.caloriesJournalieres" placeholder="Ex: 1800">
-        </div>
-        <div class="form-group">
-          <label>Date début</label>
-          <input type="date" [(ngModel)]="planForm.dateDebut">
-        </div>
-        <div class="form-group">
-          <label>Date fin</label>
-          <input type="date" [(ngModel)]="planForm.dateFin">
-        </div>
-        <div class="form-group form-full">
-          <label>Objectif</label>
-          <select [(ngModel)]="planForm.objectif">
-            @for (opt of objectifOptions; track opt) {
-            <option [value]="opt">{{ opt }}</option>
-            }
-          </select>
-        </div>
-        <div class="form-group form-full">
-          <label>Description</label>
-          <textarea [(ngModel)]="planForm.description" rows="2"
-            placeholder="Contexte et objectifs du plan..."></textarea>
-        </div>
-      </div>
-
-      <div class="repas-header">
-        <p class="section-label" style="margin:0">Repas du plan</p>
-        <button type="button" class="btn-add-repas" (click)="addRepas()">+ Ajouter repas</button>
-      </div>
-
-      @for (repas of planForm.repas; track $index; let i = $index) {
-      <div class="repas-card">
-        <div class="repas-card-top">
-          <select [(ngModel)]="repas.typeRepas" class="repas-type-select">
-            @for (t of repasTypeOptions; track t) {
-            <option [value]="t">{{ t }}</option>
-            }
-          </select>
-          <button type="button" class="btn-remove-repas" (click)="removeRepas(i)">Supprimer</button>
-        </div>
-        <div class="form-grid-2">
-          <div class="form-group">
-            <label>Nom du repas</label>
-            <input type="text" [(ngModel)]="repas.nom" placeholder="Ex: Salade niçoise">
-          </div>
-          <div class="form-group">
-            <label>Aliments</label>
-            <input type="text" [(ngModel)]="repas.aliments" placeholder="Poulet, riz, légumes...">
-          </div>
-        </div>
-        <div class="form-grid-4">
-          <div class="form-group">
-            <label>Calories (kcal)</label>
-            <input type="number" [(ngModel)]="repas.calories" placeholder="450">
-          </div>
-          <div class="form-group">
-            <label>Protéines (g)</label>
-            <input type="number" [(ngModel)]="repas.proteines" placeholder="35">
-          </div>
-          <div class="form-group">
-            <label>Glucides (g)</label>
-            <input type="number" [(ngModel)]="repas.glucides" placeholder="40">
-          </div>
-          <div class="form-group">
-            <label>Lipides (g)</label>
-            <input type="number" [(ngModel)]="repas.lipides" placeholder="12">
-          </div>
-        </div>
-        <div class="form-group" style="margin-top:8px">
-          <label>Notes</label>
-          <input type="text" [(ngModel)]="repas.notes" placeholder="Sans gluten, sans lactose...">
-        </div>
-      </div>
-      }
-
-      <div class="modal-actions">
-        <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
-        <button type="button" class="btn-save-plan" (click)="savePlan()" [disabled]="planLoading">
-          @if (planLoading) { Enregistrement... } @else { Enregistrer le plan }
-        </button>
-      </div>
-    </div>
-    }
-
   </div>
-</div>
 }
 
 <!-- ═══ RAPPORT MODAL ═══ -->
 @if (showRapportModal && rapportConsultation) {
-<div class="modal-overlay" (click)="closeRapportModal()">
-  <div class="modal-content rapport-modal-content" (click)="$event.stopPropagation()">
-
-    <!-- Header -->
-    <div class="modal-header">
-      <div class="modal-patient-info">
-        <div class="modal-avatar rapport-avatar">{{ getInitials(rapportConsultation.userId) }}</div>
-        <div>
-          <h3>Rapport · Patient #{{ rapportConsultation.userId }}</h3>
-          <span class="modal-subtitle">Consultation du {{ rapportConsultation.dateConsultation | date:'dd/MM/yyyy'
-            }}</span>
+  <div class="modal-overlay" (click)="closeRapportModal()">
+    <div class="modal-content rapport-modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <div class="modal-patient-info">
+          <div class="modal-avatar rapport-avatar">{{ getInitials(rapportConsultation.userId) }}</div>
+          <div>
+            <h3>Rapport · Patient #{{ rapportConsultation.userId }}</h3>
+            <span class="modal-subtitle">Consultation du {{ rapportConsultation.dateConsultation | date:'dd/MM/yyyy' }}</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <button type="button" class="btn-print-rapport" (click)="printRapport()">🖨 Imprimer</button>
+          <button type="button" class="modal-close" (click)="closeRapportModal()">✕</button>
         </div>
       </div>
-      <div style="display:flex;gap:8px;align-items:center">
-        <button type="button" class="btn-print-rapport" (click)="printRapport()">🖨 Imprimer</button>
-        <button type="button" class="modal-close" (click)="closeRapportModal()">✕</button>
+      <div class="modal-body rapport-body">
+        <div class="rapport-section">
+          <div class="rapport-section-title"><span class="rapport-section-icon">📏</span>Données biométriques</div>
+          <div class="rapport-biometrie-grid">
+            <div class="rapport-metric-card">
+              <span class="rapport-metric-label">Poids actuel</span>
+              <span class="rapport-metric-value v-plum">{{ rapportConsultation.poids }} kg</span>
+            </div>
+            <div class="rapport-metric-card">
+              <span class="rapport-metric-label">Taille</span>
+              <span class="rapport-metric-value v-plum">{{ rapportConsultation.taille }} m</span>
+            </div>
+            <div class="rapport-metric-card">
+              <span class="rapport-metric-label">IMC</span>
+              <span class="rapport-metric-value" [class]="imcClass(rapportConsultation.imc)">{{ rapportConsultation.imc | number:'1.1-1' }}</span>
+              <span class="rapport-imc-label" [class]="imcClass(rapportConsultation.imc)">{{ imcLabel(rapportConsultation.imc) }}</span>
+            </div>
+            <div class="rapport-metric-card">
+              <span class="rapport-metric-label">Objectif</span>
+              <span class="rapport-metric-value rapport-objectif-text">{{ rapportConsultation.objectif }}</span>
+            </div>
+          </div>
+        </div>
+        <div class="rapport-section">
+          <div class="rapport-section-title"><span class="rapport-section-icon">📋</span>Notes cliniques</div>
+          <div class="rapport-notes-grid">
+            <div class="rapport-note-block">
+              <span class="rapport-note-label">Diagnostic</span>
+              <p class="rapport-note-text">{{ rapportConsultation.diagnostic || 'Aucun diagnostic renseigné.' }}</p>
+            </div>
+            <div class="rapport-note-block">
+              <span class="rapport-note-label">Recommandations</span>
+              <p class="rapport-note-text">{{ rapportConsultation.recommandations || 'Aucune recommandation.' }}</p>
+            </div>
+            <div class="rapport-note-block rapport-note-full">
+              <span class="rapport-note-label">Notes complémentaires</span>
+              <p class="rapport-note-text">{{ rapportConsultation.notes || 'Aucune note.' }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-
-    <div class="modal-body rapport-body">
-
-      <!-- ── SECTION 1: Données biométriques ── -->
-      <div class="rapport-section">
-        <div class="rapport-section-title">
-          <span class="rapport-section-icon">📏</span>
-          Données biométriques
-        </div>
-        <div class="rapport-biometrie-grid">
-          <div class="rapport-metric-card">
-            <span class="rapport-metric-label">Poids actuel</span>
-            <span class="rapport-metric-value v-plum">{{ rapportConsultation.poids }} kg</span>
-          </div>
-          <div class="rapport-metric-card">
-            <span class="rapport-metric-label">Taille</span>
-            <span class="rapport-metric-value v-plum">{{ rapportConsultation.taille }} m</span>
-          </div>
-          <div class="rapport-metric-card">
-            <span class="rapport-metric-label">IMC</span>
-            <span class="rapport-metric-value" [class]="imcClass(rapportConsultation.imc)">
-              {{ rapportConsultation.imc | number:'1.1-1' }}
-            </span>
-            <span class="rapport-imc-label" [class]="imcClass(rapportConsultation.imc)">
-              {{ imcLabel(rapportConsultation.imc) }}
-            </span>
-          </div>
-          <div class="rapport-metric-card">
-            <span class="rapport-metric-label">Objectif</span>
-            <span class="rapport-metric-value rapport-objectif-text">{{ rapportConsultation.objectif }}</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SECTION 2: Macronutriments ── -->
-      <div class="rapport-section">
-        <div class="rapport-section-title">
-          <span class="rapport-section-icon">🥗</span>
-          Macronutriments · Plan actif
-        </div>
-        <div class="rapport-macros-row">
-          <div class="rapport-macro-block">
-            <div class="rapport-macro-bar-wrap">
-              <div class="rapport-macro-bar" style="height:70%;background:var(--c-plum)"></div>
-            </div>
-            <span class="rapport-macro-val v-plum">125g</span>
-            <span class="rapport-macro-lbl">Protéines</span>
-          </div>
-          <div class="rapport-macro-block">
-            <div class="rapport-macro-bar-wrap">
-              <div class="rapport-macro-bar" style="height:55%;background:var(--c-sage)"></div>
-            </div>
-            <span class="rapport-macro-val v-sage">180g</span>
-            <span class="rapport-macro-lbl">Glucides</span>
-          </div>
-          <div class="rapport-macro-block">
-            <div class="rapport-macro-bar-wrap">
-              <div class="rapport-macro-bar" style="height:30%;background:var(--c-amber)"></div>
-            </div>
-            <span class="rapport-macro-val v-amber">55g</span>
-            <span class="rapport-macro-lbl">Lipides</span>
-          </div>
-          <div class="rapport-macro-block rapport-macro-kcal">
-            <div class="rapport-macro-bar-wrap">
-              <div class="rapport-macro-bar" style="height:90%;background:var(--c-rose)"></div>
-            </div>
-            <span class="rapport-macro-val v-rose">1650</span>
-            <span class="rapport-macro-lbl">Kcal/jour</span>
-          </div>
-        </div>
-        <p class="rapport-macro-note">Objectif journalier recommandé · Plan alimentaire actif</p>
-      </div>
-
-      <!-- ── SECTION 3: Évolution du poids ── -->
-      <div class="rapport-section">
-        <div class="rapport-section-title">
-          <span class="rapport-section-icon">📉</span>
-          Évolution du poids
-        </div>
-        <div class="rapport-weight-chart">
-          <svg viewBox="0 0 480 80" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
-            style="width:100%;height:80px;display:block">
-            <defs>
-              <linearGradient id="rwg" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stop-color="#52B788" stop-opacity="0.25" />
-                <stop offset="100%" stop-color="#52B788" stop-opacity="0" />
-              </linearGradient>
-            </defs>
-            <path
-              d="M0,62 C30,60 60,64 100,58 C140,52 170,56 210,48 C250,40 280,44 320,36 C360,28 400,32 440,22 C460,18 470,16 480,14"
-              fill="none" stroke="#52B788" stroke-width="2.5" stroke-linecap="round" />
-            <path
-              d="M0,62 C30,60 60,64 100,58 C140,52 170,56 210,48 C250,40 280,44 320,36 C360,28 400,32 440,22 C460,18 470,16 480,14 L480,80 L0,80 Z"
-              fill="url(#rwg)" />
-            <circle cx="480" cy="14" r="5" fill="#52B788" />
-            <circle cx="0" cy="62" r="3.5" fill="#52B788" opacity="0.4" />
-          </svg>
-        </div>
-        <div class="rapport-weight-meta">
-          <div class="rapport-weight-item">
-            <span class="rapport-weight-label">Poids initial</span>
-            <span class="rapport-weight-val">{{ rapportConsultation.poids + 6 }} kg</span>
-          </div>
-          <div class="rapport-weight-progress">
-            <span class="rapport-weight-badge">↓ 6 kg perdus</span>
-            <span class="rapport-weight-pct">Objectif atteint à 82%</span>
-          </div>
-          <div class="rapport-weight-item" style="text-align:right">
-            <span class="rapport-weight-label">Poids actuel</span>
-            <span class="rapport-weight-val weight-now">{{ rapportConsultation.poids }} kg</span>
-          </div>
-        </div>
-      </div>
-
-      <!-- ── SECTION 4: Notes cliniques ── -->
-      <div class="rapport-section">
-        <div class="rapport-section-title">
-          <span class="rapport-section-icon">📋</span>
-          Notes cliniques
-        </div>
-        <div class="rapport-notes-grid">
-          <div class="rapport-note-block">
-            <span class="rapport-note-label">Diagnostic</span>
-            <p class="rapport-note-text">{{ rapportConsultation.diagnostic || 'Aucun diagnostic renseigné.' }}</p>
-          </div>
-          <div class="rapport-note-block">
-            <span class="rapport-note-label">Recommandations</span>
-            <p class="rapport-note-text">{{ rapportConsultation.recommandations || 'Aucune recommandation renseignée.'
-              }}</p>
-          </div>
-          <div class="rapport-note-block rapport-note-full">
-            <span class="rapport-note-label">Notes complémentaires</span>
-            <p class="rapport-note-text">{{ rapportConsultation.notes || 'Aucune note.' }}</p>
-          </div>
-          @if (rapportConsultation.prochainRdv) {
-          <div class="rapport-note-block">
-            <span class="rapport-note-label">Prochain rendez-vous</span>
-            <p class="rapport-note-text">{{ rapportConsultation.prochainRdv | date:'dd MMMM yyyy' }}</p>
-          </div>
-          }
-        </div>
-      </div>
-
-    </div><!-- /rapport-body -->
   </div>
-</div>
 }

@@ -457,7 +457,7 @@
           <span class="cal-icon">{{ calendarTarget === 'nutritionniste' ? '🩺' : '🏋️' }}</span>
           <div>
             <h3>RDV {{ calendarTarget === 'nutritionniste' ? 'Nutritionniste' : 'Coach Sportif' }}</h3>
-            <p class="cal-subtitle">Choisissez une date et un créneau disponible</p>
+            <p class="cal-subtitle">Choisissez une date et un créneau pour votre demande</p>
           </div>
         </div>
 
@@ -526,19 +526,25 @@
           <div class="cal-footer-btns">
             <button class="btn-cancel" (click)="closeCalendar()">Annuler</button>
             <button class="btn-confirm" [disabled]="!selectedDate || !selectedSlot || !rdvMotif.trim()" (click)="confirmRdv()">
-              Confirmer le RDV
+              Envoyer la demande
             </button>
           </div>
         </div>
 
       } @else {
         <div class="confirmation-screen">
-          <div class="confirm-icon">✅</div>
-          <h3>Demande envoyée !</h3>
-          <p class="confirm-msg">Votre demande pour le <strong>{{ fmtSelectedDate() }}</strong> à <strong>{{ selectedSlot }}</strong> a été envoyée.</p>
-          <p class="confirm-hint">Vous recevrez une confirmation dès validation.</p>
+          @if (!confirmationError) {
+            <div class="confirm-icon">✅</div>
+            <h3>Demande envoyée !</h3>
+            <p class="confirm-msg">Votre demande pour le <strong>{{ fmtSelectedDate() }}</strong> à <strong>{{ selectedSlot }}</strong> a été envoyée.</p>
+            <p class="confirm-hint">Vous recevrez une confirmation dès validation par votre {{ calendarTarget === 'nutritionniste' ? 'nutritionniste' : 'coach' }}.</p>
+          } @else {
+            <div class="confirm-icon">❌</div>
+            <h3>Échec de l'envoi</h3>
+            <p class="confirm-msg">Une erreur s'est produite. Veuillez réessayer.</p>
+          }
           <div class="confirm-btns">
-            <button class="btn-cancel" (click)="resetCalendar()">Nouveau RDV</button>
+            <button class="btn-cancel" (click)="resetCalendar()">Nouvelle demande</button>
             <button class="btn-confirm" (click)="closeCalendar()">Fermer</button>
           </div>
         </div>

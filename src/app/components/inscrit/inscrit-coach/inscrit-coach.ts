@@ -1,12 +1,11 @@
 import { Component } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth-service';
-
 
 @Component({
   selector: 'app-inscrit-coach',
+  standalone: true,
   imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './inscrit-coach.html',
   styleUrl: './inscrit-coach.css',
@@ -23,10 +22,11 @@ export class InscritCoach {
     tel: '',
     coachSpecialite: '',
     certifications: '',
+    typeAbonnement: 'AN_1', // plan par défaut
     role: 'COACH',
   };
 
-  constructor(private authService: AuthService) {}
+  constructor(private router: Router) {}
 
   register() {
     if (!this.agreed) {
@@ -37,8 +37,12 @@ export class InscritCoach {
       alert('Les mots de passe ne correspondent pas.');
       return;
     }
-    this.authService.register(this.formData).subscribe({
-      next: () => alert('Coach inscrit avec succès !'),
-    });
+
+    sessionStorage.setItem('register_data', JSON.stringify(this.formData));
+    this.router.navigate(['/abonnement']);
+  }
+
+  selectPlan(plan: string) {
+    this.formData.typeAbonnement = plan;
   }
 }

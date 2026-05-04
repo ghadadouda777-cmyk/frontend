@@ -5,9 +5,6 @@ import { RendezVous } from '../../interfaces/rendez-vous';
 
 @Injectable({ providedIn: 'root' })
 export class RendezVousService {
-  getByPatient(patientId: number) {
-    throw new Error('Method not implemented.');
-  } // ✅ renamed
   private api = 'http://localhost:8084/api/rendez-vous';
 
   constructor(private http: HttpClient) {}
@@ -16,12 +13,19 @@ export class RendezVousService {
     return this.http.get<RendezVous[]>(this.api);
   }
 
-  getByNutritionniste(id: number): Observable<RendezVous[]> {
+  // ✅ String UUID
+  getByNutritionniste(id: string): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(`${this.api}/nutritionniste/${id}`);
   }
 
-  getByCoach(id: number): Observable<RendezVous[]> {
+  // ✅ String UUID
+  getByCoach(id: string): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(`${this.api}/coach/${id}`);
+  }
+
+  // ✅ String UUID
+  getByPatient(id: string): Observable<RendezVous[]> {
+    return this.http.get<RendezVous[]>(`${this.api}/user/${id}`);
   }
 
   getByStatut(statut: string): Observable<RendezVous[]> {

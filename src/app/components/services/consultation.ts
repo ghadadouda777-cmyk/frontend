@@ -13,7 +13,8 @@ export class ConsultationService {
     return this.http.get<Consultation[]>(this.api);
   }
 
-  getByNutritionniste(id: number): Observable<Consultation[]> {
+  // ✅ String UUID
+  getByNutritionniste(id: string): Observable<Consultation[]> {
     return this.http.get<Consultation[]>(`${this.api}/nutritionniste/${id}`);
   }
 

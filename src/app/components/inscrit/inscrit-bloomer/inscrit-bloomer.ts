@@ -1,13 +1,21 @@
 import { Component } from '@angular/core';
-import { RouterLink, Router } from '@angular/router';  // ← ajouter Router
+import { RouterLink, Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../services/auth-service';
+import { HttpClient } from '@angular/common/http';
 
-
+@Component({
+  selector: 'app-inscrit-bloomer',
+  standalone: true,
+  imports: [RouterLink, FormsModule, CommonModule],
+  templateUrl: './inscrit-bloomer.html',
+  styleUrl: './inscrit-bloomer.css'
+})
 export class InscritBloomer {
   confirmPwd = '';
   agreed = false;
+  loading = false;
+  errorMessage = '';
 
   formData = {
     nom: '',
@@ -23,7 +31,9 @@ export class InscritBloomer {
     role: 'BLOOMER',
   };
 
-  constructor(private authService: AuthService, private router: Router) {} // ← ajouter Router
+  private apiUrl = 'http://localhost:8084/api';
+
+  constructor(private router: Router, private http: HttpClient) {}
 
   register() {
     if (!this.agreed) {
@@ -34,14 +44,20 @@ export class InscritBloomer {
       alert('Les mots de passe ne correspondent pas.');
       return;
     }
-    this.authService.register(this.formData).subscribe({
-      next: () => {
-        alert('Bloomer inscrit avec succès !');
-        this.router.navigate(['/dashboard/bloomer']); // ← REDIRECTION
+
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.http.post<any>(`${this.apiUrl}/auth/register`, this.formData).subscribe({
+      next: (res) => {
+        this.loading = false;
+        localStorage.setItem('token', res.token);
+        localStorage.setItem('role', res.role);
+        this.router.navigate(['/dashboard/bloomerr']);
       },
       error: (err) => {
-        console.error(err);
-        alert('Erreur lors de l\'inscription : ' + err.message);
+        this.loading = false;
+        this.errorMessage = err.error?.message || 'Erreur lors de l\'inscription.';
       }
     });
   }

@@ -178,7 +178,7 @@ export class CoachDashboard implements OnInit {
       '2'
     );
     this.rdvLoading = true;
-    this.rdvService.getByCoach(coachId).subscribe({
+    this.rdvService.getByCoach(String(coachId)).subscribe({
       next: (data: RendezVous[]) => {
         this.rdvEnAttente = data.filter(r => r.statut === 'EN_ATTENTE');
         this.rdvConfirmes = data.filter(r => r.statut === 'CONFIRME');
