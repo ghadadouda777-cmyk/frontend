@@ -95,6 +95,7 @@ export class PatientDashboard implements OnInit, OnDestroy {
   selectedSlot:      string | null = null;
   rdvMotif           = '';
   confirmationDone   = false;
+  confirmationError  = false;
 
   readonly timeSlots = [
     '08:00','08:30','09:00','09:30',
@@ -295,18 +296,28 @@ export class PatientDashboard implements OnInit, OnDestroy {
       statut:           'EN_ATTENTE'
     };
 
-    this.http.post<RendezVous>(this.rdvApi, rdv).subscribe(() => {
-      this.confirmationDone = true;
-      if (this.calendarTarget === 'nutritionniste') this.loadRdvNutri();
-      else this.loadRdvCoach();
+    // Show the result screen immediately
+    this.confirmationDone  = true;
+    this.confirmationError = false;
+
+    this.http.post<RendezVous>(this.rdvApi, rdv).subscribe({
+      next: () => {
+        this.confirmationError = false;
+        if (this.calendarTarget === 'nutritionniste') this.loadRdvNutri();
+        else this.loadRdvCoach();
+      },
+      error: () => {
+        this.confirmationError = true;
+      }
     });
   }
 
   resetCalendar(): void {
-    this.selectedDate     = null;
-    this.selectedSlot     = null;
-    this.confirmationDone = false;
-    this.rdvMotif         = '';
+    this.selectedDate      = null;
+    this.selectedSlot      = null;
+    this.confirmationDone  = false;
+    this.confirmationError = false;
+    this.rdvMotif          = '';
   }
 
   // ── Helpers calendrier ────────────────────────────────────────────────────
