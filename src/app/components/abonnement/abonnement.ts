@@ -66,7 +66,7 @@ export class Abonnement implements OnInit {
     } else if (r === 'nutritionist') {
       this.router.navigate(['/dashboard/nutritionist']);
     } else {
-      this.router.navigate(['/dashboard/bloomer']);
+      this.router.navigate(['/dashboard/bloomerr']);
     }
   }
 

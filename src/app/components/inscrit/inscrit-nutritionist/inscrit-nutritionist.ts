@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
@@ -9,6 +9,8 @@ import { CommonModule } from '@angular/common';
   imports: [RouterLink, FormsModule, CommonModule],
   templateUrl: './inscrit-nutritionist.html',
   styleUrl: './inscrit-nutritionist.css',
+    encapsulation: ViewEncapsulation.None,  // ← AJOUTER
+
 })
 export class InscritNutritionist {
   confirmPwd = '';
@@ -22,11 +24,15 @@ export class InscritNutritionist {
     tel: '',
     specialite: '',
     localisation: '',
-    typeAbonnement: '',
+    typeAbonnement: 'AN_1',
     role: 'NUTRITIONIST',
   };
 
   constructor(private router: Router) {}
+
+  selectPlan(plan: string) {
+    this.formData.typeAbonnement = plan;
+  }
 
   register() {
     if (!this.agreed) {
@@ -37,13 +43,7 @@ export class InscritNutritionist {
       alert('Les mots de passe ne correspondent pas.');
       return;
     }
-
-    // ✅ Sauvegarde les données et redirige vers la page abonnement
     sessionStorage.setItem('register_data', JSON.stringify(this.formData));
     this.router.navigate(['/abonnement']);
-  }
-
-  selectPlan(plan: string) {
-    this.formData.typeAbonnement = plan;
   }
 }
