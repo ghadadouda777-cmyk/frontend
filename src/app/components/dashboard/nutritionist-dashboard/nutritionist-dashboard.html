@@ -32,9 +32,9 @@
       <span class="nav-label">Paramètres</span>
     </div>
     <div class="nav-footer">
-      <div class="nav-avatar">NK</div>
+      <div class="nav-avatar">{{ (profileForm.prenom[0] || '') + (profileForm.nom[0] || '') }}</div>
       <div class="nav-user-info">
-        <span class="nav-user-name">Dr. NK</span>
+        <span class="nav-user-name">Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</span>
         <span class="nav-user-role">Nutritionniste</span>
       </div>
     </div>
@@ -53,11 +53,9 @@
     <!-- ═══ PAGE PARAMÈTRES ═══ -->
     @if (activePage === 'params') {
       <div class="params-wrapper">
-
-        <!-- Header -->
         <div class="params-header">
           <div class="params-header-left">
-            <div class="params-avatar">NK</div>
+            <div class="params-avatar">{{ (profileForm.prenom[0] || '') + (profileForm.nom[0] || '') }}</div>
             <div>
               <h2 class="params-title">Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</h2>
               <p class="params-subtitle">{{ profileForm.specialite }}</p>
@@ -68,7 +66,6 @@
           </button>
         </div>
 
-        <!-- Alerts -->
         @if (paramSuccess) {
           <div class="alert-success" style="margin-bottom:16px">✓ {{ paramSuccess }}</div>
         }
@@ -77,8 +74,6 @@
         }
 
         <div class="params-layout">
-
-          <!-- Tabs sidebar -->
           <div class="params-tabs-sidebar">
             <div class="params-tab-item" [class.active]="activeParamsTab==='compte'" (click)="setParamsTab('compte')">
               <span>👤</span> Mon compte
@@ -97,16 +92,14 @@
             </div>
           </div>
 
-          <!-- Tab content -->
           <div class="params-content">
 
-            <!-- ── COMPTE ── -->
             @if (activeParamsTab === 'compte') {
               <div class="params-section">
                 <h3 class="params-section-title">Informations personnelles</h3>
                 <p class="params-section-desc">Modifiez vos informations de profil visibles par vos patients.</p>
                 <div class="params-avatar-block">
-                  <div class="params-avatar-big">NK</div>
+                  <div class="params-avatar-big">{{ (profileForm.prenom[0] || '') + (profileForm.nom[0] || '') }}</div>
                   <div>
                     <p class="params-avatar-name">Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</p>
                     <p class="params-avatar-role">{{ profileForm.specialite }}</p>
@@ -145,7 +138,6 @@
               </div>
             }
 
-            <!-- ── SECURITE ── -->
             @if (activeParamsTab === 'securite') {
               <div class="params-section">
                 <h3 class="params-section-title">Changer le mot de passe</h3>
@@ -180,7 +172,6 @@
               </div>
             }
 
-            <!-- ── NOTIFICATIONS ── -->
             @if (activeParamsTab === 'notifs') {
               <div class="params-section">
                 <h3 class="params-section-title">Préférences de notifications</h3>
@@ -247,7 +238,6 @@
               </div>
             }
 
-            <!-- ── PRÉFÉRENCES ── -->
             @if (activeParamsTab === 'prefs') {
               <div class="params-section">
                 <h3 class="params-section-title">Préférences d'affichage</h3>
@@ -262,72 +252,16 @@
                   </div>
                   <div class="pref-langue-grid">
                     <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'fr'" (click)="onLangueChange('fr')">
-                      <span class="pref-flag">🇫🇷</span>
-                      <span class="pref-lang-name">Français</span>
+                      <span>🇫🇷</span><span class="pref-lang-name">Français</span>
                       @if (previewLangue === 'fr') { <span class="pref-check">✓</span> }
                     </button>
                     <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'en'" (click)="onLangueChange('en')">
-                      <span class="pref-flag">🇬🇧</span>
-                      <span class="pref-lang-name">English</span>
+                      <span>🇬🇧</span><span class="pref-lang-name">English</span>
                       @if (previewLangue === 'en') { <span class="pref-check">✓</span> }
                     </button>
                     <button type="button" class="pref-langue-btn" [class.active]="previewLangue === 'ar'" (click)="onLangueChange('ar')">
-                      <span class="pref-flag">🇹🇳</span>
-                      <span class="pref-lang-name">العربية</span>
+                      <span>🇹🇳</span><span class="pref-lang-name">العربية</span>
                       @if (previewLangue === 'ar') { <span class="pref-check">✓</span> }
-                    </button>
-                  </div>
-                </div>
-                <div class="pref-block">
-                  <div class="pref-block-header">
-                    <span class="pref-block-icon">🎨</span>
-                    <div>
-                      <span class="pref-block-label">Thème de l'interface</span>
-                      <span class="pref-block-hint">Actif : <strong>{{ previewTheme === 'light' ? '☀️ Clair' : previewTheme === 'dark' ? '🌙 Sombre' : '🖥️ Automatique' }}</strong></span>
-                    </div>
-                  </div>
-                  <div class="pref-theme-grid">
-                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'light'" (click)="onThemeChange('light')">
-                      <div class="theme-preview theme-preview-light">
-                        <div class="tp-sidebar"></div>
-                        <div class="tp-body">
-                          <div class="tp-card"></div>
-                          <div class="tp-card tp-card-sm"></div>
-                        </div>
-                      </div>
-                      <div class="pref-theme-label">
-                        <span>☀️ Clair</span>
-                        @if (previewTheme === 'light') { <span class="pref-check">✓</span> }
-                      </div>
-                    </button>
-                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'dark'" (click)="onThemeChange('dark')">
-                      <div class="theme-preview theme-preview-dark">
-                        <div class="tp-sidebar"></div>
-                        <div class="tp-body">
-                          <div class="tp-card"></div>
-                          <div class="tp-card tp-card-sm"></div>
-                        </div>
-                      </div>
-                      <div class="pref-theme-label">
-                        <span>🌙 Sombre</span>
-                        @if (previewTheme === 'dark') { <span class="pref-check">✓</span> }
-                      </div>
-                    </button>
-                    <button type="button" class="pref-theme-card" [class.active]="previewTheme === 'auto'" (click)="onThemeChange('auto')">
-                      <div class="theme-preview theme-preview-auto">
-                        <div class="tp-half-light">
-                          <div class="tp-sidebar"></div>
-                          <div class="tp-body"><div class="tp-card"></div></div>
-                        </div>
-                        <div class="tp-half-dark">
-                          <div class="tp-sidebar"></div>
-                          <div class="tp-body"><div class="tp-card"></div></div>
-                        </div>
-                      </div>
-                      <div class="pref-theme-label">
-                        <span>🖥️ Automatique</span>
-                        @if (previewTheme === 'auto') { <span class="pref-check">✓</span> }
-                      </div>
                     </button>
                   </div>
                 </div>
@@ -337,29 +271,31 @@
               </div>
             }
 
-          </div><!-- /params-content -->
-        </div><!-- /params-layout -->
-      </div><!-- /params-wrapper -->
+          </div>
+        </div>
+      </div>
     }
 
     <!-- ═══ PAGE DASHBOARD ═══ -->
     @if (activePage === 'dashboard') {
 
+      <!-- HEADER -->
       <div class="dashboard-header">
         <div class="header-left">
           <div class="brand-mark">🥗</div>
           <div>
             <h1 class="dashboard-title">Nutritionist <span>Dashboard</span></h1>
-            <p class="welcome-text">Bienvenue ! Mardi 6 mai 2025</p>
+            <p class="welcome-text">Bienvenue, Dr. {{ profileForm.prenom }} {{ profileForm.nom }}</p>
           </div>
         </div>
         <div class="header-right">
           <div class="notif-btn">🔔<span class="notif-dot"></span></div>
           <button class="btn-new-client">+ Nouveau client</button>
-          <div class="avatar-icon">NK</div>
+          <div class="avatar-icon">{{ (profileForm.prenom[0] || '') + (profileForm.nom[0] || '') }}</div>
         </div>
       </div>
 
+      <!-- STATS -->
       <div class="stats-grid">
         <div class="stat-card">
           <div class="stat-icon si-sage">👥</div>
@@ -391,9 +327,11 @@
         </div>
       </div>
 
+      <!-- MAIN GRID -->
       <div class="main-grid">
         <div class="left-column">
 
+          <!-- CARD RDV -->
           <div class="card">
             <div class="card-header">
               <h2>Rendez-vous du jour</h2>
@@ -416,7 +354,7 @@
                 <div class="rdv-item">
                   <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
                   <div class="rdv-info">
-                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-name">{{ rdv.patientNom || 'Patient #' + rdv.userId }}</p>
                     <p class="rdv-type">{{ rdv.motif }}</p>
                   </div>
                   <div class="rdv-actions">
@@ -436,7 +374,7 @@
                 <div class="rdv-item">
                   <div class="rdv-time-bubble">{{ rdv.dateHeure | date:'HH' }}h</div>
                   <div class="rdv-info">
-                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-name">{{ rdv.patientNom || 'Patient #' + rdv.userId }}</p>
                     <p class="rdv-type">{{ rdv.motif }}</p>
                   </div>
                   <span class="badge-status confirmed">confirmé</span>
@@ -453,7 +391,7 @@
                 <div class="rdv-item">
                   <div class="rdv-time-bubble grey">{{ rdv.dateHeure | date:'HH' }}h</div>
                   <div class="rdv-info">
-                    <p class="rdv-name">Patient #{{ rdv.userId }}</p>
+                    <p class="rdv-name">{{ rdv.patientNom || 'Patient #' + rdv.userId }}</p>
                     <p class="rdv-type">{{ rdv.motif }}</p>
                   </div>
                   <span class="badge-status refused">refusé</span>
@@ -466,6 +404,7 @@
             }
           </div>
 
+          <!-- CARD CLIENTS RECENTS -->
           <div class="card">
             <div class="card-header">
               <h2>Clients récents</h2>
@@ -495,6 +434,7 @@
             }
           </div>
 
+          <!-- QUICK ACTIONS -->
           <div class="quick-actions-grid">
             <div class="action-card">
               <div class="action-icon si-sage">📊</div>
@@ -512,6 +452,7 @@
 
         </div>
 
+        <!-- SIDEBAR DROITE -->
         <div class="sidebar">
           <div class="card">
             <div class="card-header">
@@ -522,7 +463,7 @@
               <div class="upcoming-item">
                 <div class="up-dot" [class]="rdv.dotColor"></div>
                 <div class="up-info">
-                  <div class="up-name">Patient #{{ rdv.userId }}</div>
+                  <div class="up-name">{{ rdv.patientNom || 'Patient #' + rdv.userId }}</div>
                   <div class="up-time">{{ rdv.dateHeure | date:'EEE · HH:mm' }}</div>
                 </div>
                 <span class="up-type" [class]="rdv.badgeColor">{{ rdv.motif }}</span>
@@ -535,13 +476,7 @@
         </div>
       </div>
 
-      <!-- ═══════════════════════════════════════════════════════════
-           CONSULTATIONS PATIENTS
-           ✅ Affiche une ligne par RDV CONFIRMÉ
-           ✅ Bouton "Voir & Plan" TOUJOURS visible
-           ✅ Si consultation existante → IMC + bouton Rapport aussi
-           ✅ Sinon → badge "En attente" + formulaire plan direct
-      ════════════════════════════════════════════════════════════ -->
+      <!-- CONSULTATIONS PATIENTS -->
       <div class="card full-width">
         <div class="card-header"><h2>Consultations Patients</h2></div>
 
@@ -549,36 +484,30 @@
           <div class="consultation-row">
             <div class="patient-avatar-sm">{{ getInitials(rdv.userId) }}</div>
             <div class="consultation-info">
-              <span class="patient-id">Patient #{{ rdv.userId }}</span>
+              <span class="patient-id">{{ rdv.patientNom || 'Patient #' + rdv.userId }}</span>
               <span class="consultation-date">{{ rdv.dateHeure | date:'dd/MM/yyyy' }}</span>
               <span class="objectif-tag">{{ rdv.motif }}</span>
             </div>
 
-            <!-- IMC si consultation existante, sinon badge En attente -->
             @if (getConsultationByUserId(rdv.userId); as consultation) {
               <span class="imc-pill" [class]="imcClass(consultation.imc)">
                 IMC: {{ consultation.imc | number:'1.1-1' }}
               </span>
             } @else {
-              <span class="imc-pill"
-                style="background:#f3f4f6;color:#9ca3af;border:1px dashed #d1d5db;">
+              <span class="imc-pill" style="background:#f3f4f6;color:#9ca3af;border:1px dashed #d1d5db;">
                 En attente de consultation
               </span>
             }
 
-            <!-- Actions : Voir & Plan TOUJOURS visible -->
             <div class="row-actions">
-              <button type="button" class="btn-sm btn-voir"
-                (click)="openPlanModal(rdv)">
+              <button type="button" class="btn-sm btn-voir" (click)="openPlanModal(rdv)">
                 👁 Voir &amp; Plan
               </button>
-              <button type="button" class="btn-sm btn-conv"
-                (click)="openConversation(rdv.userId)">
+              <button type="button" class="btn-sm btn-conv" (click)="openConversation(rdv.userId)">
                 💬 Conversation
               </button>
               @if (getConsultationByUserId(rdv.userId); as consultation) {
-                <button type="button" class="btn-sm btn-rapport"
-                  (click)="openRapport(consultation.id)">
+                <button type="button" class="btn-sm btn-rapport" (click)="openRapport(consultation.id)">
                   📝 Rapport
                 </button>
               }
@@ -591,12 +520,11 @@
         }
       </div>
 
-    } <!-- fin @if dashboard -->
+    }
+  </div>
+</div>
 
-  </div><!-- /main-content -->
-</div><!-- /dashboard-wrapper -->
-
-<!-- ═══ CONSULTATION MODAL ═══ -->
+<!-- ═══ MODAL PLAN ALIMENTAIRE ═══ -->
 @if (showModal) {
   <div class="modal-overlay" (click)="closeModal()">
     <div class="modal-content" (click)="$event.stopPropagation()">
@@ -617,7 +545,6 @@
         <button type="button" class="modal-close" (click)="closeModal()">✕</button>
       </div>
 
-      <!-- Onglets : "Détails patient" masqué si pas de consultation -->
       <div class="modal-tabs">
         @if (selectedConsultation) {
           <button type="button" [class.active]="activeModalTab === 'details'" (click)="setModalTab('details')">
@@ -642,7 +569,9 @@
             </div>
             <div class="detail-card">
               <span class="detail-label">IMC</span>
-              <strong class="detail-value" [class]="imcClass(selectedConsultation.imc)">{{ selectedConsultation.imc | number:'1.1-1' }}</strong>
+              <strong class="detail-value" [class]="imcClass(selectedConsultation.imc)">
+                {{ selectedConsultation.imc | number:'1.1-1' }}
+              </strong>
             </div>
             <div class="detail-card">
               <span class="detail-label">Objectif</span>
@@ -673,6 +602,7 @@
         <div class="modal-body">
           @if (planSuccess) { <div class="alert-success">✓ {{ planSuccess }}</div> }
           @if (planError)   { <div class="alert-error">⚠ {{ planError }}</div> }
+
           <p class="section-label">Informations du plan</p>
           <div class="form-grid-2">
             <div class="form-group">
@@ -702,10 +632,12 @@
               <textarea [(ngModel)]="planForm.description" rows="2" placeholder="Contexte et objectifs du plan..."></textarea>
             </div>
           </div>
+
           <div class="repas-header">
             <p class="section-label" style="margin:0">Repas du plan</p>
             <button type="button" class="btn-add-repas" (click)="addRepas()">+ Ajouter repas</button>
           </div>
+
           @for (repas of planForm.repas; track $index; let i = $index) {
             <div class="repas-card">
               <div class="repas-card-top">
@@ -736,6 +668,7 @@
               </div>
             </div>
           }
+
           <div class="modal-actions">
             <button type="button" class="btn-cancel" (click)="closeModal()">Annuler</button>
             <button type="button" class="btn-save-plan" (click)="savePlan()" [disabled]="planLoading">
@@ -779,8 +712,12 @@
             </div>
             <div class="rapport-metric-card">
               <span class="rapport-metric-label">IMC</span>
-              <span class="rapport-metric-value" [class]="imcClass(rapportConsultation.imc)">{{ rapportConsultation.imc | number:'1.1-1' }}</span>
-              <span class="rapport-imc-label" [class]="imcClass(rapportConsultation.imc)">{{ imcLabel(rapportConsultation.imc) }}</span>
+              <span class="rapport-metric-value" [class]="imcClass(rapportConsultation.imc)">
+                {{ rapportConsultation.imc | number:'1.1-1' }}
+              </span>
+              <span class="rapport-imc-label" [class]="imcClass(rapportConsultation.imc)">
+                {{ imcLabel(rapportConsultation.imc) }}
+              </span>
             </div>
             <div class="rapport-metric-card">
               <span class="rapport-metric-label">Objectif</span>

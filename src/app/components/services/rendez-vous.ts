@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { RendezVous } from '../../interfaces/rendez-vous';
 
@@ -9,43 +9,52 @@ export class RendezVousService {
 
   constructor(private http: HttpClient) {}
 
+  // ✅ Helper : génère les headers avec le token JWT
+  private getHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`
+    });
+  }
+
   getAll(): Observable<RendezVous[]> {
-    return this.http.get<RendezVous[]>(this.api);
+    return this.http.get<RendezVous[]>(this.api, { headers: this.getHeaders() });
   }
-getAllNutritionnistes(): Observable<any[]> {
-  return this.http.get<any[]>(`${this.api}/nutritionnistes`);
-}
-  // ✅ String UUID
+
+  getAllNutritionnistes(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.api}/nutritionnistes`, { headers: this.getHeaders() });
+  }
+
   getByNutritionniste(id: string): Observable<RendezVous[]> {
-    return this.http.get<RendezVous[]>(`${this.api}/nutritionniste/${id}`);
+    return this.http.get<RendezVous[]>(`${this.api}/nutritionniste/${id}`, { headers: this.getHeaders() });
   }
 
-  // ✅ String UUID
   getByCoach(id: string): Observable<RendezVous[]> {
-    return this.http.get<RendezVous[]>(`${this.api}/coach/${id}`);
+    return this.http.get<RendezVous[]>(`${this.api}/coach/${id}`, { headers: this.getHeaders() });
   }
 
-  // ✅ String UUID
   getByPatient(id: string): Observable<RendezVous[]> {
-    return this.http.get<RendezVous[]>(`${this.api}/user/${id}`);
+    return this.http.get<RendezVous[]>(`${this.api}/user/${id}`, { headers: this.getHeaders() });
   }
 
   getByStatut(statut: string): Observable<RendezVous[]> {
-    return this.http.get<RendezVous[]>(`${this.api}/statut/${statut}`);
+    return this.http.get<RendezVous[]>(`${this.api}/statut/${statut}`, { headers: this.getHeaders() });
   }
 
   accepter(id: number): Observable<RendezVous> {
-    return this.http.patch<RendezVous>(`${this.api}/${id}/accepter`, {});
+    return this.http.patch<RendezVous>(`${this.api}/${id}/accepter`, {}, { headers: this.getHeaders() });
   }
 
   refuser(id: number): Observable<RendezVous> {
-    return this.http.patch<RendezVous>(`${this.api}/${id}/refuser`, {});
+    return this.http.patch<RendezVous>(`${this.api}/${id}/refuser`, {}, { headers: this.getHeaders() });
   }
 
   terminer(id: number): Observable<RendezVous> {
-    return this.http.patch<RendezVous>(`${this.api}/${id}/terminer`, {});
+    return this.http.patch<RendezVous>(`${this.api}/${id}/terminer`, {}, { headers: this.getHeaders() });
   }
+
   create(rdv: any): Observable<RendezVous> {
-  return this.http.post<RendezVous>(this.api, rdv);
-}
+    return this.http.post<RendezVous>(this.api, rdv, { headers: this.getHeaders() });
+  }
 }

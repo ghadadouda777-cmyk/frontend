@@ -17,17 +17,24 @@ export class AuthService {
   login(data: any): Observable<any> {
     return this.http.post(`${this.apiUrl}/login`, data).pipe(
       tap((response: any) => {
-        if (response.token)  localStorage.setItem('token',  response.token);
-        if (response.id)     localStorage.setItem('userId', response.id); // ✅ pas de toString()
-        if (response.role)   localStorage.setItem('role',   response.role);
-        if (response.nom)    localStorage.setItem('nom',    response.nom);
-        if (response.prenom) localStorage.setItem('prenom', response.prenom);
-        if (response.email)  localStorage.setItem('email',  response.email);
+        if (response.token)           localStorage.setItem('token',           response.token);
+        if (response.role)            localStorage.setItem('role',            response.role);
+        if (response.nom)             localStorage.setItem('nom',             response.nom);
+        if (response.prenom)          localStorage.setItem('prenom',          response.prenom);
+        if (response.email)           localStorage.setItem('email',           response.email);
+
+        // ✅ FIX : sauvegarde l'ID spécifique selon le rôle
+        if (response.role === 'NUTRITIONIST' && response.nutritionnisteId) {
+          localStorage.setItem('userId', response.nutritionnisteId);
+        } else if (response.role === 'BLOOMER' && response.bloomerId) {
+          localStorage.setItem('userId', response.bloomerId);
+        } else if (response.id) {
+          localStorage.setItem('userId', response.id); // fallback
+        }
       })
     );
   }
 
-  // ✅ String UUID
   getUserId(): string {
     return localStorage.getItem('userId') ?? '';
   }
