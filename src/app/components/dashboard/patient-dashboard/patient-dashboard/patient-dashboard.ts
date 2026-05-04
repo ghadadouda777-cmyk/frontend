@@ -1,4 +1,5 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, NgZone, ChangeDetectorRef } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -46,9 +47,9 @@ export type Section =
 })
 export class PatientDashboard implements OnInit, OnDestroy {
 
-  userId = 1;
-  nutritionnisteId = 1;
-  coachId = 2;
+  userId: any = 1;
+  nutritionnisteId: any = 1;
+  coachId: any = 2;
 
   activeSection: Section = 'dashboard';
 
@@ -103,31 +104,56 @@ export class PatientDashboard implements OnInit, OnDestroy {
   readonly DAY_NAMES = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
 
   profile = {
-    prenom: 'Ahmed',
-    nom: 'Aloui',
-    email: 'ahmed.aloui@email.com',
-    phone: '+216 12 345 678',
-    age: 28,
-    ville: 'Tunis'
+    prenom: '',
+    nom: '',
+    email: '',
+    phone: '',
+    age: 0,
+    height: 0,
+    weight: 0,
+    goal: '',
+    ville: ''
   };
 
   nutritionnistes: any[] = [];
   nutritionnisteSelectionne: any = null;
+
+  coachs: any[] = [];
+  coachSelectionne: any = null;
 
   private pollSub: Subscription | null = null;
 
   constructor(
     private rdvService: RendezVousService,
     private consultService: ConsultationService,
-    private http: HttpClient
+    private http: HttpClient,
+    private ngZone: NgZone,
+    private cdr: ChangeDetectorRef,
+    @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
   ngOnInit(): void {
+    // Guard localStorage — only available in browser
+    if (isPlatformBrowser(this.platformId)) {
+      this.userId       = localStorage.getItem('userId')  ?? this.userId;
+      this.profile.prenom = localStorage.getItem('prenom') ?? this.profile.prenom;
+      this.profile.nom    = localStorage.getItem('nom')    ?? this.profile.nom;
+      this.profile.email  = localStorage.getItem('email')  ?? this.profile.email;
+    }
+
     const now = new Date();
     this.calendarYear = now.getFullYear();
     this.calendarMonth = now.getMonth();
     this.buildCalendar();
-    this.loadAll();
+
+    // Always load data — works both SSR and browser
+    this.loadNutritionnistes();
+    this.loadCoachs();
+    this.loadRdvNutri();
+    this.loadRdvCoach();
+    this.loadConsultations();
+    this.loadPlan();
+    this.loadProfile();
   }
 
   ngOnDestroy(): void {
@@ -140,6 +166,7 @@ export class PatientDashboard implements OnInit, OnDestroy {
     this.loadConsultations();
     this.loadPlan();
     this.loadNutritionnistes();
+    this.loadCoachs();
   }
 
   loadRdvNutri(nutriId?: number | string): void {
@@ -160,11 +187,12 @@ export class PatientDashboard implements OnInit, OnDestroy {
     });
   }
 
-  loadRdvCoach(): void {
+  loadRdvCoach(coachId?: number | string): void {
+    const idToFilter = String(coachId ?? this.coachId);
     this.rdvService.getAll().subscribe((data: RendezVous[]) => {
       const mine = data.filter(
         r => String(r.userId) === String(this.userId) &&
-             String(r.coachId) === String(this.coachId)
+             String(r.coachId) === idToFilter
       );
       this.rdvCoachEnAttente = mine.filter(r => r.statut === 'EN_ATTENTE');
       this.rdvCoachConfirmes = mine.filter(r => r.statut === 'CONFIRME');
@@ -201,10 +229,48 @@ export class PatientDashboard implements OnInit, OnDestroy {
 
   loadNutritionnistes(): void {
     this.rdvService.getAllNutritionnistes().subscribe((data: any[]) => {
-      this.nutritionnistes = data;
+      this.ngZone.run(() => {
+        this.nutritionnistes = data;
+        console.log('✅ Nutritionnistes reçus:', data.length);
+        this.cdr.detectChanges();
+      });
     });
   }
 
+  loadCoachs(): void {
+    this.rdvService.getAllCoachs().subscribe({
+      next: (data: any[]) => {
+        this.ngZone.run(() => {
+          console.log('✅ Coachs reçus:', data);
+          this.coachs = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error('❌ Erreur loadCoachs:', err);
+      }
+    });
+  }
+
+  loadProfile(): void {
+    if (!this.userId) return;
+    this.http.get<any>(`http://localhost:8084/api/users/${this.userId}`).subscribe({
+      next: (data) => {
+        this.ngZone.run(() => {
+          this.profile.prenom = data.prenom ?? '';
+          this.profile.nom    = data.nom    ?? '';
+          this.profile.email  = data.email  ?? '';
+          this.profile.phone  = data.tel    ?? '';
+          this.profile.age    = data.age    ?? 0;
+          this.profile.height = data.height ?? 0;
+          this.profile.weight = data.weight ?? 0;
+          this.profile.goal   = data.goal   ?? '';
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => console.error('❌ Erreur loadProfile:', err)
+    });
+  }
   selectNutritionniste(nutri: any): void {
   this.nutritionnisteSelectionne = nutri;
   this.nutritionnisteId = nutri.id;
@@ -248,12 +314,24 @@ export class PatientDashboard implements OnInit, OnDestroy {
 
   goTo(section: Section): void {
     this.activeSection = section;
+    this.cdr.detectChanges();
+    // Reload lists when navigating to these sections
+    if (section === 'rdv-coach') {
+      this.loadCoachs();
+    }
+    if (section === 'rdv-nutritionniste') {
+      this.loadNutritionnistes();
+    }
   }
 
-  // ✅ FIX : redirige vers la liste si pas de nutritionniste sélectionné
+  // ✅ FIX : redirige vers la liste si pas de nutritionniste/coach sélectionné
   openCalendarFor(target: 'nutritionniste' | 'coach'): void {
     if (target === 'nutritionniste' && !this.nutritionnisteSelectionne) {
       this.activeSection = 'rdv-nutritionniste';
+      return;
+    }
+    if (target === 'coach' && !this.coachSelectionne) {
+      this.activeSection = 'rdv-coach';
       return;
     }
 
@@ -340,12 +418,12 @@ export class PatientDashboard implements OnInit, OnDestroy {
     }
     rdv.nutritionnisteId = String(nutriId);
   } else {
-    if (!this.coachId) {
+    if (!this.coachSelectionne?.id && !this.coachId) {
       this.confirmationDone = true;
       this.confirmationError = true;
       return;
     }
-    rdv.coachId = String(this.coachId);
+    rdv.coachId = String(this.coachSelectionne?.id ?? this.coachId);
   }
 
   // ✅ Log pour vérifier le payload
@@ -359,7 +437,7 @@ export class PatientDashboard implements OnInit, OnDestroy {
       if (this.calendarTarget === 'nutritionniste') {
         this.loadRdvNutri(nutriId);
       } else {
-        this.loadRdvCoach();
+        this.loadRdvCoach(this.coachSelectionne?.id ?? this.coachId);
       }
     },
     error: (err) => {
@@ -371,8 +449,6 @@ export class PatientDashboard implements OnInit, OnDestroy {
 }
 // ✅ Ajoutez cette méthode
 selectEtOuvrirCalendrier(nutri: any): void {
-  console.log('🟢 Nutritionniste sélectionné:', nutri);  // ← debug
-  
   this.nutritionnisteSelectionne = nutri;
   this.nutritionnisteId = nutri.id;
   this.loadRdvNutri(nutri.userId);
@@ -384,10 +460,21 @@ selectEtOuvrirCalendrier(nutri: any): void {
   this.confirmationError = false;
   this.rdvMotif = '';
   this.buildCalendar();
-  
-  console.log('🟢 showCalendar:', this.showCalendar);  // ← debug
 }
-  // ✅ FIX NG0955 : trackBy correct
+
+selectEtOuvrirCalendrierCoach(coach: any): void {
+  this.coachSelectionne = coach;
+  this.coachId = coach.id;
+  this.loadRdvCoach(coach.userId ?? coach.id);
+  this.calendarTarget = 'coach';
+  this.showCalendar = true;
+  this.selectedDate = null;
+  this.selectedSlot = null;
+  this.confirmationDone = false;
+  this.confirmationError = false;
+  this.rdvMotif = '';
+  this.buildCalendar();
+}  // ✅ FIX NG0955 : trackBy correct
   trackByIndex(index: number): number {
     return index;
   }

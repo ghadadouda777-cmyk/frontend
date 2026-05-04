@@ -15,6 +15,10 @@ export class RendezVousService {
 getAllNutritionnistes(): Observable<any[]> {
   return this.http.get<any[]>(`${this.api}/nutritionnistes`);
 }
+
+getAllCoachs(): Observable<any[]> {
+  return this.http.get<any[]>(`${this.api}/coachs`);
+}
   // ✅ String UUID
   getByNutritionniste(id: string): Observable<RendezVous[]> {
     return this.http.get<RendezVous[]>(`${this.api}/nutritionniste/${id}`);

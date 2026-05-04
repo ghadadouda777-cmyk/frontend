@@ -17,6 +17,23 @@ export const serverRoutes: ServerRoute[] = [
     path: 'authentification/:role',
     renderMode: RenderMode.Server
   },
+  // Dashboards need browser APIs (localStorage, HTTP) — client-side only
+  {
+    path: 'dashboard/bloomer',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'dashboard/coach',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'dashboard/nutritionist',
+    renderMode: RenderMode.Client
+  },
+  {
+    path: 'dashboard/:userId',
+    renderMode: RenderMode.Client
+  },
   {
     path: '**',
     renderMode: RenderMode.Prerender
