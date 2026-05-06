@@ -46,7 +46,11 @@
     <!-- ═══ PAGE CONVERSATIONS ═══ -->
     @if (activePage === 'conv') {
       <div style="height:100%;display:flex;flex-direction:column;">
-        <app-conversation [initialPatientId]="selectedPatientId"></app-conversation>
+        <app-conversation
+          [role]="'NUTRITIONIST'"
+          [userId]="nutritionnisteId"
+          [initialPatientId]="selectedPatientId">
+        </app-conversation>
       </div>
     }
 

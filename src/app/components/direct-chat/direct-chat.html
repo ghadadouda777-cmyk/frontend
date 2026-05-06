@@ -1,0 +1,57 @@
+<div class="chat-wrapper">
+
+  @if (loading) {
+    <div class="chat-loading"><span>Connexion en cours...</span></div>
+  }
+
+  @if (error && !loading) {
+    <div class="chat-error">{{ error }}</div>
+  }
+
+  @if (!loading && !error) {
+    <div class="chat-messages" #messagesEl>
+
+      @if (messages.length === 0) {
+        <div class="chat-empty">
+          <div class="chat-empty-avatar">{{ targetName ? targetName[0] : '?' }}</div>
+          <p class="chat-empty-name">{{ targetName }}</p>
+          <p class="chat-empty-hint">Commencez la conversation</p>
+        </div>
+      }
+
+      @for (msg of messages; track msg.id) {
+        <div class="msg-row" [class.mine]="isMine(msg)" [class.theirs]="!isMine(msg)">
+          @if (!isMine(msg)) {
+            <div class="msg-avatar">{{ targetName ? targetName[0] : '?' }}</div>
+          }
+          <div class="msg-content">
+            @if (!isMine(msg)) {
+              <span class="msg-sender-name">{{ targetName }}</span>
+            }
+            <div class="msg-bubble" [class.bubble-mine]="isMine(msg)" [class.bubble-theirs]="!isMine(msg)">
+              {{ msg.content }}
+            </div>
+            <span class="msg-time" [class.time-right]="isMine(msg)">
+              {{ msg.sentAt | date:'HH:mm' }}
+            </span>
+          </div>
+        </div>
+      }
+
+    </div>
+
+    <div class="chat-input-bar">
+      <input
+        class="chat-input"
+        type="text"
+        placeholder="Write a message"
+        [(ngModel)]="newMessage"
+        (keydown.enter)="onEnter($any($event))"
+      />
+      <button class="chat-send-btn" [disabled]="!newMessage.trim() || sending" (click)="sendMessage()">
+        @if (sending) { ⏳ } @else { ➤ }
+      </button>
+    </div>
+  }
+
+</div>

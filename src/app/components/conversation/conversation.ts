@@ -1,8 +1,10 @@
 import {
   Component, OnInit, OnDestroy, NgZone,
   ViewChild, ElementRef, AfterViewChecked,
-  ChangeDetectorRef, Input, OnChanges, SimpleChanges
+  ChangeDetectorRef, Input, OnChanges, SimpleChanges,
+  Inject, PLATFORM_ID
 } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { CommonModule, DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
@@ -13,7 +15,7 @@ import { switchMap } from 'rxjs/operators';
 export interface MessageDTO {
   id: number;
   conversationId: number;
-  senderId: number;
+  senderId: string;
   senderRole: 'PATIENT' | 'NUTRITIONIST';
   content: string;
   isRead: boolean;
@@ -22,8 +24,10 @@ export interface MessageDTO {
 
 export interface ConversationDTO {
   id: number;
-  patientId: number;
-  nutritionistId: number;
+  patientId: string;
+  nutritionistId: string;
+  coachId: string | null;
+  type: string;
   status: 'ACTIVE' | 'CLOSED' | 'ARCHIVED';
   createdAt: string;
   updatedAt: string;
@@ -41,11 +45,14 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
 
   @ViewChild('messagesEl') private messagesEl!: ElementRef<HTMLDivElement>;
 
-  @Input() initialPatientId: number | null = null;  // ← AJOUT
+  @Input() initialPatientId: number | null = null;
+  @Input() role: 'NUTRITIONIST' | 'PATIENT' = 'NUTRITIONIST';
+  @Input() userId: string = '';
+  @Input() targetId: string | null = null; // nutritionistId or coachId to chat with
 
-  readonly currentRole: 'NUTRITIONIST' | 'PATIENT' = 'NUTRITIONIST';
-  readonly currentUserId = 1;
-  readonly nutritionistId = 1;
+  get currentRole(): 'NUTRITIONIST' | 'PATIENT' { return this.role; }
+  get currentUserId(): string { return this.userId; }
+  get nutritionistId(): string { return this.targetId ?? ''; }
 
   private readonly apiUrl = 'http://localhost:8084/api';
 
@@ -59,8 +66,8 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
   sendingMessage = false;
 
   showNewConvModal = false;
-  newConvPatientId: number | null = null;
-  newConvNutritionistId: number | null = this.nutritionistId;
+  newConvPatientId: string | null = null;
+  newConvNutritionistId: string | null = null;
   newConvError = '';
   creatingConv = false;
 
@@ -79,24 +86,59 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
   ) { }
 
   ngOnInit(): void {
+    // userId comes from @Input — already set before ngOnInit by Angular
     this.loadConversations();
+
+    // auto-open for patient: create/open conversation with target
+    if (this.role === 'PATIENT' && this.userId && this.targetId) {
+      this.openOrCreateConversation();
+    }
 
     // depuis l'URL (ancienne route)
     const patientId = this.route.snapshot.paramMap.get('patientId');
     if (patientId) {
-      this.autoOpenOrCreateConversation(Number(patientId));
+      this.autoOpenOrCreateConversation(patientId);
     }
 
     // depuis le dashboard via @Input
     if (this.initialPatientId) {
-      this.autoOpenOrCreateConversation(this.initialPatientId);
+      this.autoOpenOrCreateConversation(String(this.initialPatientId));
     }
   }
 
-  // ← AJOUT : réagit quand initialPatientId change
+  private openOrCreateConversation(): void {
+    if (!this.userId || !this.targetId) return; // need both IDs
+    const payload: any = { patientId: this.userId };
+    if (this.targetId) {
+      payload.nutritionistId = this.targetId;
+    }
+    this.http.post<ConversationDTO>(`${this.apiUrl}/conversations`, payload).subscribe({
+      next: conv => this.ngZone.run(() => {
+        const idx = this.conversations.findIndex(c => c.id === conv.id);
+        if (idx === -1) this.conversations = [conv, ...this.conversations];
+        this.selectConversation(conv);
+        this.cdr.detectChanges();
+      }),
+      error: err => console.error('Erreur auto-open conv:', err)
+    });
+  }
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['initialPatientId'] && changes['initialPatientId'].currentValue) {
-      this.autoOpenOrCreateConversation(changes['initialPatientId'].currentValue);
+      this.autoOpenOrCreateConversation(String(changes['initialPatientId'].currentValue));
+    }
+    // When userId arrives (patient dashboard sets it from localStorage)
+    if (changes['userId'] && changes['userId'].currentValue) {
+      this.loadConversations();
+      if (this.role === 'PATIENT' && this.targetId) {
+        this.openOrCreateConversation();
+      }
+    }
+    // When targetId arrives
+    if (changes['targetId'] && changes['targetId'].currentValue && this.userId) {
+      if (this.role === 'PATIENT') {
+        this.openOrCreateConversation();
+      }
     }
   }
 
@@ -111,8 +153,16 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
     this.stopPolling();
   }
 
-  autoOpenOrCreateConversation(patientId: number): void {
-    const payload = { patientId, nutritionistId: this.nutritionistId };
+  autoOpenOrCreateConversation(patientId: string): void {
+    const payload: any = { patientId };
+    if (this.role === 'PATIENT') {
+      // patient opening conversation with nutritionist or coach
+      if (this.targetId) {
+        payload.nutritionistId = this.targetId;
+      }
+    } else {
+      payload.nutritionistId = this.currentUserId;
+    }
     this.http.post<ConversationDTO>(`${this.apiUrl}/conversations`, payload).subscribe({
       next: conv => this.ngZone.run(() => {
         const idx = this.conversations.findIndex(c => c.id === conv.id);
@@ -125,6 +175,8 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   loadConversations(): void {
+    if (!this.userId) return;
+
     const url = this.currentRole === 'NUTRITIONIST'
       ? `${this.apiUrl}/conversations/nutritionist/${this.currentUserId}`
       : `${this.apiUrl}/conversations/patient/${this.currentUserId}`;
@@ -212,7 +264,7 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
     this.cdr.detectChanges();
 
     this.sendingMessage = true;
-    const payload: Partial<MessageDTO> = {
+    const payload = {
       conversationId: this.selectedConv.id,
       senderId: this.currentUserId,
       senderRole: this.currentRole,
@@ -278,7 +330,7 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
     this.showNewConvModal = true;
     this.newConvError = '';
     this.newConvPatientId = null;
-    this.newConvNutritionistId = this.nutritionistId;
+    this.newConvNutritionistId = null;
   }
 
   closeNewConvModal(): void {
@@ -327,9 +379,21 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   getOtherLabel(conv: ConversationDTO): string {
-    return this.currentRole === 'NUTRITIONIST'
-      ? `Patient #${conv.patientId}`
-      : `Nutritionniste #${conv.nutritionistId}`;
+    if (this.currentRole === 'NUTRITIONIST') {
+      return `Patient #${conv.patientId.substring(0, 8)}…`;
+    }
+    // For patient: show nutritionniste or coach name
+    if (conv.nutritionistId) {
+      return `Nutritionniste #${conv.nutritionistId.substring(0, 8)}…`;
+    }
+    if (conv.coachId) {
+      return `Coach #${conv.coachId.substring(0, 8)}…`;
+    }
+    return 'Conversation';
+  }
+
+  isActive(conv: ConversationDTO): boolean {
+    return String(conv.status).toUpperCase() === 'ACTIVE';
   }
 
   lastMessage(conv: ConversationDTO): string {
@@ -339,7 +403,7 @@ export class ConversationComponent implements OnInit, OnDestroy, AfterViewChecke
   }
 
   isMine(msg: MessageDTO): boolean {
-    return msg.senderId === this.currentUserId && msg.senderRole === this.currentRole;
+    return String(msg.senderId) === String(this.currentUserId);
   }
 
   senderInitial(msg: MessageDTO): string {
