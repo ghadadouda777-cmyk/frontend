@@ -33,6 +33,7 @@ export interface PlanForm {
 }
 
 export interface UpcomingRdv extends RendezVous {
+  patientNom: any;
   dotColor: string;
   badgeColor: string;
 }
@@ -148,9 +149,9 @@ export class NutritionistDashboard implements OnInit {
     this.nutritionnisteId = localStorage.getItem('userId') ?? '';
     console.log('✅ nutritionnisteId =', this.nutritionnisteId);
 
-    const nom    = localStorage.getItem('nom')    || '';
+    const nom = localStorage.getItem('nom') || '';
     const prenom = localStorage.getItem('prenom') || '';
-    this.profileForm.nom    = nom;
+    this.profileForm.nom = nom;
     this.profileForm.prenom = prenom;
 
     if (!this.nutritionnisteId) {
@@ -171,7 +172,7 @@ export class NutritionistDashboard implements OnInit {
         this.ngZone.run(() => {
           this.rendezVousEnAttente = data.filter(r => r.statut === 'EN_ATTENTE');
           this.rendezVousConfirmes = data.filter(r => r.statut === 'CONFIRME');
-          this.rendezVousRefuses  = data.filter(r => r.statut === 'REFUSE');
+          this.rendezVousRefuses = data.filter(r => r.statut === 'REFUSE');
           this.buildUpcomingRdv(data);
           console.log('✅ En attente:', this.rendezVousEnAttente.length);
           console.log('✅ Confirmés:', this.rendezVousConfirmes.length);
@@ -186,34 +187,24 @@ export class NutritionistDashboard implements OnInit {
   }
 
   loadConsultations(): void {
-    this.http.get<Consultation[]>(`${this.apiUrl}/consultations/nutritionniste/${this.nutritionnisteId}`)
-      .subscribe({
-        next: (data: Consultation[]) => {
-          this.ngZone.run(() => {
-            this.consultations = data;
-            console.log('✅ Consultations reçues:', data.length);
-            this.cdr.detectChanges();
-          });
-        },
-        error: (err) => {
-          console.error('❌ Erreur loadConsultations - status:', err.status, 'url:', err.url);
-          this.http.get<Consultation[]>(`${this.apiUrl}/consultations/by-nutritionniste/${this.nutritionnisteId}`)
-            .subscribe({
-              next: (data: Consultation[]) => {
-                this.ngZone.run(() => {
-                  this.consultations = data;
-                  this.cdr.detectChanges();
-                });
-              },
-              error: (err2) => {
-                console.error('❌ Endpoint alternatif aussi échoué:', err2.status);
-              }
-            });
-        }
-      });
-  }
+    const token = localStorage.getItem('token');
+    const headers = { Authorization: `Bearer ${token}` };
 
-  // ✅ CORRIGÉ : comparaison robuste UUID/string
+    this.http.get<Consultation[]>(
+      `${this.apiUrl}/consultations/nutritionniste/${this.nutritionnisteId}`,
+      { headers }
+    ).subscribe({
+      next: (data) => {
+        this.ngZone.run(() => {
+          this.consultations = data;
+          this.cdr.detectChanges();
+        });
+      },
+      error: (err) => {
+        console.error('❌ Consultations error:', err.status);
+      }
+    });
+  }
   getConsultationByUserId(userId: any): Consultation | undefined {
     return this.consultations.find(c =>
       String(c.userId).toLowerCase().trim() ===
@@ -221,9 +212,7 @@ export class NutritionistDashboard implements OnInit {
     );
   }
 
-  // ✅ NOUVEAU : ouvre le modal Plan depuis un RDV confirmé
-  // - Si consultation existante → affiche détails + onglet plan
-  // - Sinon → ouvre directement le formulaire plan alimentaire
+
   openPlanModal(rdv: RendezVous): void {
     this.selectedRdv = rdv;
     const existing = this.getConsultationByUserId(rdv.userId);
@@ -449,7 +438,6 @@ export class NutritionistDashboard implements OnInit {
     this.planError = '';
     this.planSuccess = '';
 
-    // ✅ CORRIGÉ : utilise selectedRdv comme fallback si pas de consultation
     const payload = {
       nom: this.planForm.nom,
       description: this.planForm.description,
@@ -464,7 +452,10 @@ export class NutritionistDashboard implements OnInit {
       repas: this.planForm.repas
     };
 
-    this.http.post<any>(`${this.apiUrl}/plans-alimentaires`, payload)
+    // ✅ FIX : ajout du token JWT
+    const headers = { Authorization: `Bearer ${localStorage.getItem('token')}` };
+
+    this.http.post<any>(`${this.apiUrl}/plans-alimentaires`, payload, { headers })
       .pipe(finalize(() => this.ngZone.run(() => this.planLoading = false)))
       .subscribe({
         next: () => this.ngZone.run(() => {
@@ -483,15 +474,15 @@ export class NutritionistDashboard implements OnInit {
 
   imcClass(imc: number): string {
     if (imc < 18.5) return 'imc-low';
-    if (imc < 25)   return 'imc-normal';
-    if (imc < 30)   return 'imc-overweight';
+    if (imc < 25) return 'imc-normal';
+    if (imc < 30) return 'imc-overweight';
     return 'imc-obese';
   }
 
   imcLabel(imc: number): string {
     if (imc < 18.5) return 'Insuffisance pondérale';
-    if (imc < 25)   return 'Poids normal';
-    if (imc < 30)   return 'Surpoids';
+    if (imc < 25) return 'Poids normal';
+    if (imc < 30) return 'Surpoids';
     return 'Obésité';
   }
 
