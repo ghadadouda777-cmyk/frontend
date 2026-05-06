@@ -76,7 +76,7 @@
         <div class="stat-card">
           <div class="stat-icon teal">⚖️</div>
           <div class="stat-info">
-            <div class="stat-val">{{ derniereConsultation?.poids ?? '—' }}</div>
+            <div class="stat-val">{{ displayPoids }}</div>
             <p class="stat-label">Poids (kg)</p>
           </div>
         </div>
@@ -97,7 +97,7 @@
         <div class="stat-card">
           <div class="stat-icon green">📊</div>
           <div class="stat-info">
-            <div class="stat-val">{{ derniereConsultation ? (derniereConsultation.imc | number:'1.1-1') : '—' }}</div>
+            <div class="stat-val">{{ displayImc }}</div>
             <p class="stat-label">IMC</p>
           </div>
         </div>
@@ -126,6 +126,12 @@
             </div>
           } @else {
             <p class="empty-state">Aucune consultation disponible</p>
+            @if (profile.weight || profile.goal) {
+              <div class="suivi-row"><span class="suivi-label">Poids initial</span><span class="suivi-val">{{ profile.weight }} kg</span></div>
+              <div class="suivi-row"><span class="suivi-label">Taille</span><span class="suivi-val">{{ profile.height }} cm</span></div>
+              <div class="suivi-row"><span class="suivi-label">Objectif</span><span class="suivi-val goal">🎯 {{ profile.goal }}</span></div>
+              <div class="suivi-row"><span class="suivi-label">IMC estimé</span><span class="suivi-val">{{ getImcFromProfile() }}</span></div>
+            }
           }
         </div>
 
@@ -383,7 +389,83 @@
 
     <!-- PLAN ALIMENTAIRE -->
     @if (activeSection === 'plan') {
-      <!-- contenu plan alimentaire -->
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">🥗 Plan <span>Alimentaire</span></h1>
+          <p class="page-sub">Votre plan nutritionnel personnalisé</p>
+        </div>
+      </div>
+
+      @if (planLoading) {
+        <p class="empty-state">⏳ Chargement du plan...</p>
+      } @else if (!planAlimentaire) {
+        <div class="card" style="text-align:center; padding: 3rem;">
+          <p style="font-size:48px">🥗</p>
+          <h3 style="color:#111827; margin:12px 0 8px">Aucun plan alimentaire</h3>
+          <p style="color:#6b7280">Votre nutritionniste n'a pas encore créé de plan pour vous.</p>
+        </div>
+      } @else {
+        <!-- En-tête du plan -->
+        <div class="card" style="margin-bottom:1.5rem">
+          <div style="display:flex; justify-content:space-between; align-items:flex-start; flex-wrap:wrap; gap:12px">
+            <div>
+              <h2 style="font-size:20px; font-weight:800; color:#111827; margin-bottom:6px">
+                {{ planAlimentaire.titre }}
+              </h2>
+              <p style="color:#6b7280; font-size:14px">{{ planAlimentaire.objectif }}</p>
+            </div>
+            <div style="display:flex; gap:12px; flex-wrap:wrap">
+              <div class="stat-card" style="min-width:120px">
+                <div class="stat-icon teal">🔥</div>
+                <div class="stat-info">
+                  <div class="stat-val">{{ getTotalCalories() }}</div>
+                  <p class="stat-label">kcal / jour</p>
+                </div>
+              </div>
+              <div class="stat-card" style="min-width:120px">
+                <div class="stat-icon blue">📅</div>
+                <div class="stat-info">
+                  <div class="stat-val">{{ planAlimentaire.repas.length }}</div>
+                  <p class="stat-label">Repas</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:24px; flex-wrap:wrap">
+            <span style="font-size:13px; color:#6b7280">
+              📆 Début : <strong>{{ planAlimentaire.dateCreation | date:'dd/MM/yyyy' }}</strong>
+            </span>
+          </div>
+        </div>
+
+        <!-- Liste des repas -->
+        <div class="card full-width">
+          <div class="card-header">
+            <h2>Repas du plan</h2>
+            <span class="count-badge">{{ planAlimentaire.repas.length }}</span>
+          </div>
+          @for (repas of planAlimentaire.repas; track repas.id) {
+            <div class="consultation-row" style="cursor:default">
+              <div class="patient-avatar" style="background:linear-gradient(135deg,#0d9488,#059669); font-size:20px; display:flex; align-items:center; justify-content:center">
+                {{ getRepasIcon(repas.type) }}
+              </div>
+              <div class="consultation-info" style="flex:1">
+                <span class="cinfo-id" style="font-weight:700; color:#111827">{{ getRepasLabel(repas.typeRepas || repas.type) }}</span>
+                <span class="cinfo-date">{{ repas.nom || '—' }}</span>
+                <span class="cinfo-obj" style="color:#6b7280; font-size:12px">
+                  {{ repas.aliments && repas.aliments.length ? (repas.aliments | json) : '—' }}
+                </span>
+              </div>
+              <span class="imc-pill" style="background:#f0fdf4; color:#059669; border:1px solid #bbf7d0">
+                🔥 {{ repas.calories }} kcal
+              </span>
+            </div>
+          }
+          @if (planAlimentaire.repas.length === 0) {
+            <p class="empty-state">Aucun repas dans ce plan</p>
+          }
+        </div>
+      }
     }
 
     <!-- MESSAGES -->
@@ -391,11 +473,21 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">💬 Messages <span>Nutritionniste</span></h1>
-          <p class="page-sub">Conversation avec Dr. Sarah Benali</p>
+          <p class="page-sub">
+            @if (nutritionnistes[0]) {
+              Dr. {{ nutritionnistes[0].prenom }} {{ nutritionnistes[0].nom }}
+            }
+          </p>
         </div>
       </div>
       <div class="conversation-wrapper">
-        <app-conversation></app-conversation>
+        <app-direct-chat
+          [patientId]="userId"
+          [targetId]="nutritionnisteSelectionne?.id ?? (nutritionnistes[0]?.id ?? null)"
+          [targetName]="'Dr. ' + (nutritionnisteSelectionne?.prenom ?? nutritionnistes[0]?.prenom ?? '') + ' ' + (nutritionnisteSelectionne?.nom ?? nutritionnistes[0]?.nom ?? '')"
+          [senderRole]="'PATIENT'"
+          [isCoach]="false">
+        </app-direct-chat>
       </div>
     }
 
@@ -403,11 +495,21 @@
       <div class="page-header">
         <div>
           <h1 class="page-title">💬 Messages <span>Coach Sportif</span></h1>
-          <p class="page-sub">Conversation avec votre coach sportif</p>
+          <p class="page-sub">
+            @if (coachs[0]) {
+              {{ coachs[0].prenom }} {{ coachs[0].nom }}
+            }
+          </p>
         </div>
       </div>
       <div class="conversation-wrapper">
-        <app-conversation></app-conversation>
+        <app-direct-chat
+          [patientId]="userId"
+          [targetId]="coachSelectionne?.id ?? (coachs[0]?.id ?? null)"
+          [targetName]="(coachSelectionne?.prenom ?? coachs[0]?.prenom ?? '') + ' ' + (coachSelectionne?.nom ?? coachs[0]?.nom ?? '')"
+          [senderRole]="'PATIENT'"
+          [isCoach]="true">
+        </app-direct-chat>
       </div>
     }
 

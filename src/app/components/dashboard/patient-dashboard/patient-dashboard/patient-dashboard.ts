@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, NgZone, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, Inject, PLATFORM_ID, NgZone, ChangeDetectorRef, ApplicationRef } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { CommonModule, DatePipe, DecimalPipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,7 +7,7 @@ import { Subscription } from 'rxjs';
 
 import { RendezVousService } from '../../../services/rendez-vous';
 import { ConsultationService } from '../../../services/consultation';
-import { ConversationComponent } from '../../../conversation/conversation';
+import { DirectChatComponent } from '../../../direct-chat/direct-chat';
 
 import { RendezVous } from '../../../../interfaces/rendez-vous';
 import { Consultation } from '../../../../interfaces/consultation';
@@ -15,8 +15,14 @@ import { Consultation } from '../../../../interfaces/consultation';
 interface RepasJour {
   id: number;
   type: string;
+  typeRepas: string;
+  nom: string;
   calories: number;
-  aliments: string[];
+  aliments: string | string[];
+  proteines?: number;
+  glucides?: number;
+  lipides?: number;
+  notes?: string;
 }
 
 interface PlanAlimentaireDetail {
@@ -41,7 +47,8 @@ export type Section =
 @Component({
   selector: 'app-patient-dashboard',
   standalone: true,
-  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule, ConversationComponent],
+  host: { 'ngSkipHydration': 'true' },
+  imports: [CommonModule, DatePipe, DecimalPipe, FormsModule, DirectChatComponent],
   templateUrl: './patient-dashboard.html',
   styleUrls: ['./patient-dashboard.css']
 })
@@ -50,6 +57,11 @@ export class PatientDashboard implements OnInit, OnDestroy {
   userId: any = 1;
   nutritionnisteId: any = 1;
   coachId: any = 2;
+
+  // Numeric IDs for conversation system (uses Long, not UUID)
+  convPatientId: number = 1;
+  convNutriId: number = 1;
+  convCoachId: number = 2;
 
   activeSection: Section = 'dashboard';
 
@@ -129,6 +141,7 @@ export class PatientDashboard implements OnInit, OnDestroy {
     private http: HttpClient,
     private ngZone: NgZone,
     private cdr: ChangeDetectorRef,
+    private appRef: ApplicationRef,
     @Inject(PLATFORM_ID) private platformId: Object
   ) {}
 
@@ -153,7 +166,8 @@ export class PatientDashboard implements OnInit, OnDestroy {
     this.loadRdvCoach();
     this.loadConsultations();
     this.loadPlan();
-    this.loadProfile();
+    // Delay profile load to ensure hydration is complete
+    setTimeout(() => this.loadProfile(), 100);
   }
 
   ngOnDestroy(): void {
@@ -232,6 +246,11 @@ export class PatientDashboard implements OnInit, OnDestroy {
       this.ngZone.run(() => {
         this.nutritionnistes = data;
         console.log('✅ Nutritionnistes reçus:', data.length);
+        // Auto-select for messaging
+        if (!this.nutritionnisteSelectionne && data.length > 0 &&
+            (this.activeSection === 'messages-nutritionniste')) {
+          this.nutritionnisteSelectionne = data[0];
+        }
         this.cdr.detectChanges();
       });
     });
@@ -243,6 +262,11 @@ export class PatientDashboard implements OnInit, OnDestroy {
         this.ngZone.run(() => {
           console.log('✅ Coachs reçus:', data);
           this.coachs = data;
+          // Auto-select for messaging
+          if (!this.coachSelectionne && data.length > 0 &&
+              (this.activeSection === 'messages-coach')) {
+            this.coachSelectionne = data[0];
+          }
           this.cdr.detectChanges();
         });
       },
@@ -253,19 +277,27 @@ export class PatientDashboard implements OnInit, OnDestroy {
   }
 
   loadProfile(): void {
+    console.log('🔍 loadProfile called, userId:', this.userId);
     if (!this.userId) return;
     this.http.get<any>(`http://localhost:8084/api/users/${this.userId}`).subscribe({
       next: (data) => {
+        console.log('✅ Profile data:', data);
         this.ngZone.run(() => {
-          this.profile.prenom = data.prenom ?? '';
-          this.profile.nom    = data.nom    ?? '';
-          this.profile.email  = data.email  ?? '';
-          this.profile.phone  = data.tel    ?? '';
-          this.profile.age    = data.age    ?? 0;
-          this.profile.height = data.height ?? 0;
-          this.profile.weight = data.weight ?? 0;
-          this.profile.goal   = data.goal   ?? '';
+          this.profile = {
+            ...this.profile,
+            prenom: data.prenom ?? '',
+            nom:    data.nom    ?? '',
+            email:  data.email  ?? '',
+            phone:  data.tel    ?? '',
+            age:    data.age    ?? 0,
+            height: data.height ?? 0,
+            weight: data.weight ?? 0,
+            goal:   data.goal   ?? ''
+          };
+          console.log('✅ profile.weight set to:', this.profile.weight);
+          this.cdr.markForCheck();
           this.cdr.detectChanges();
+          this.appRef.tick();
         });
       },
       error: (err) => console.error('❌ Erreur loadProfile:', err)
@@ -321,6 +353,19 @@ export class PatientDashboard implements OnInit, OnDestroy {
     }
     if (section === 'rdv-nutritionniste') {
       this.loadNutritionnistes();
+    }
+    // Auto-select first nutritionniste/coach for messaging if none selected
+    if (section === 'messages-nutritionniste' && !this.nutritionnisteSelectionne && this.nutritionnistes.length > 0) {
+      this.nutritionnisteSelectionne = this.nutritionnistes[0];
+    }
+    if (section === 'messages-nutritionniste' && !this.nutritionnisteSelectionne) {
+      this.loadNutritionnistes();
+    }
+    if (section === 'messages-coach' && !this.coachSelectionne && this.coachs.length > 0) {
+      this.coachSelectionne = this.coachs[0];
+    }
+    if (section === 'messages-coach' && !this.coachSelectionne) {
+      this.loadCoachs();
     }
   }
 
@@ -536,6 +581,17 @@ selectEtOuvrirCalendrierCoach(coach: any): void {
     });
   }
 
+  get displayPoids(): string {
+    if (this.derniereConsultation?.poids) return String(this.derniereConsultation.poids);
+    if (this.profile.weight) return this.profile.weight + ' kg';
+    return '—';
+  }
+
+  get displayImc(): string {
+    if (this.derniereConsultation) return this.derniereConsultation.imc.toFixed(1);
+    return this.getImcFromProfile();
+  }
+
   getImcPercent(): string {
     if (!this.derniereConsultation) return '0%';
     const pct = Math.min(
@@ -543,6 +599,13 @@ selectEtOuvrirCalendrierCoach(coach: any): void {
       100
     );
     return `${pct.toFixed(1)}%`;
+  }
+
+  getImcFromProfile(): string {
+    if (!this.profile.weight || !this.profile.height) return '—';
+    const heightM = this.profile.height / 100;
+    const imc = this.profile.weight / (heightM * heightM);
+    return imc.toFixed(1);
   }
 
   getImcLabel(): string {

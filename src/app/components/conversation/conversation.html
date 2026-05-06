@@ -28,7 +28,7 @@
         <div
           class="conv-item"
           [class.active]="selectedConv?.id === conv.id"
-          [class.closed]="conv.status === 'CLOSED'"
+          [class.closed]="!isActive(conv)"
           (click)="selectConversation(conv)"
         >
           <div class="conv-item-avatar" [class]="avatarColor(conv.id)">
@@ -41,7 +41,7 @@
             </div>
             <div class="conv-item-bottom">
               <span class="conv-item-preview">{{ lastMessage(conv) }}</span>
-              @if (conv.status === 'CLOSED') {
+              @if (!isActive(conv)) {
                 <span class="conv-badge closed">Fermée</span>
               } @else {
                 <span class="conv-badge active">Active</span>
@@ -80,13 +80,13 @@
           </div>
           <div class="conv-thread-meta">
             <span class="conv-thread-name">{{ getOtherLabel(selectedConv) }}</span>
-            <span class="conv-thread-status" [class.status-active]="selectedConv.status === 'ACTIVE'">
-              {{ selectedConv.status === 'ACTIVE' ? '● En ligne' : '○ Fermée' }}
+            <span class="conv-thread-status" [class.status-active]="isActive(selectedConv)">
+              {{ isActive(selectedConv) ? '● En ligne' : '○ Fermée' }}
             </span>
           </div>
         </div>
         <div class="conv-thread-actions">
-          @if (selectedConv.status === 'ACTIVE') {
+          @if (isActive(selectedConv)) {
             <button class="btn-close-conv" (click)="closeConversation(selectedConv.id)">
               Fermer la conv.
             </button>
@@ -130,8 +130,8 @@
       </div>
 
       <!-- Input bar -->
-      <div class="conv-input-bar" [class.disabled]="selectedConv.status !== 'ACTIVE'">
-        @if (selectedConv.status !== 'ACTIVE') {
+      <div class="conv-input-bar" [class.disabled]="!isActive(selectedConv)">
+        @if (!isActive(selectedConv)) {
           <p class="conv-closed-notice">Cette conversation est fermée. Impossible d'envoyer des messages.</p>
         } @else {
           <textarea
